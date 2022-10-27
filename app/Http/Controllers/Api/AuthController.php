@@ -2,61 +2,57 @@
 namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\User;
-use Carbon\Carbon;
-use http\Message\Body;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+
 class AuthController extends Controller
 {
     public function signup(Request $request)
     {
-        dd($request);
-        $request->validate([
-            'name'     => 'required|string',
-            'email'    => 'required|string|email|unique:users',
-            'password' => 'required|string|confirmed',
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:6',
         ]);
-
-        $user = new User([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'points'   => 100,
-            'password' => bcrypt($request->password),
-        ]);
-        $user->save();
-
-        return response()->json([
-            'message' => 'Successfully created user!'], 201);
+        if ($validator->fails())
+        {
+            return response(['errors'=>$validator->errors()->all()], 422);
+        }
+        $request['password']=Hash::make($request['password']);
+        $user = User::create($request->toArray());
+        $token = $user->createToken('Laravel Password Grant Client')->accessToken;
+        $response = ['token' => $token];
+        return response($response, 200);
     }
+
     public function login(Request $request)
     {
 
-        $request->validate([
-            'username'      => 'required|string',
-            'password'    => 'required|string',
-            'remember_me' => 'boolean',
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|string|email|max:255',
+            'password' => 'required|string|min:6',
         ]);
-        $credentials = request(['username', 'password']);
-        if (!Auth::attempt($credentials)) {
-            return response()->json([
-                'message' => 'Unauthorized'], 401);
+        if ($validator->fails())
+        {
+            return response(['errors'=>$validator->errors()->all()], 422);
         }
-        $username = $request->user();
-        $tokenResult = $username->createToken('Personal Access Token');
-        $token = $tokenResult->token;
-        if ($request->remember_me) {
-            $token->expires_at = Carbon::now()->addWeeks(1);
-        }else{
-            $token->expires_at = Carbon::now()->addHours(1);
+        $user = User::where('email', $request->email)->first();
+        if ($user) {
+            if (Hash::check($request->password, $user->password)) {
+                $token = $user->createToken('Laravel Password Grant Client')->accessToken;
+                $response = ['token' => $token];
+                return response($response, 200);
+            } else {
+                $response = ["message" => "Password mismatch"];
+                return response($response, 422);
+            }
+        } else {
+            $response = ["message" =>'User does not exist'];
+            return response($response, 422);
         }
-        $token->save();
-        return response()->json([
-            'access_token' => $tokenResult->accessToken,
-            'token_type'   => 'Bearer',
-            'expires_at'   => Carbon::parse(
-                $tokenResult->token->expires_at)
-                ->toDateTimeString(),
-        ]);
+
     }
 
     public function logout(Request $request)
@@ -73,5 +69,9 @@ class AuthController extends Controller
         return response()->json($request->user());
     }
 
-
+//     public function isLoggedOut(): Response
+//     {
+//         return response()->json([
+//             'message' => 'Successfully legged out'],201);
+//     }
 }
