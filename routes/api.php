@@ -23,6 +23,6 @@ Route::group(['prefix' => 'auth'], function () {
     Route::post('signup', 'App\Http\Controllers\Api\AuthController@signup');
 });
 Route::group(['middleware' => 'auth:api', 'namespace'], function() {
-    Route::get('logout', 'Api\AuthController@logout');
-    Route::get('user', 'Api\AuthController@user');
+    Route::get('logout', 'App\Http\Controllers\Api\AuthController@logout');
+    Route::get('user', 'App\Http\Controllers\Api\AuthController@user');
 });
