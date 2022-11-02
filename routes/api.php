@@ -21,6 +21,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::group(['prefix' => 'auth'], function () {
     Route::post('login', 'App\Http\Controllers\Api\AuthController@login')->name('login');
     Route::post('signup', 'App\Http\Controllers\Api\AuthController@signup');
+    Route::post('googleAuth', 'App\Http\Controllers\Api\AuthController@googleAuth');
 });
 Route::group(['middleware' => 'auth:api', 'namespace'], function() {
     Route::get('logout', 'App\Http\Controllers\Api\AuthController@logout');

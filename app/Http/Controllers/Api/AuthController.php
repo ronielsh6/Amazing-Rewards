@@ -27,6 +27,29 @@ class AuthController extends Controller
         return response($response, 200);
     }
 
+    public function googleAuth(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|string|email|max:255',
+        ]);
+        if ($validator->fails())
+        {
+            return response(['errors'=>$validator->errors()->all()], 422);
+        }
+        $user = User::where('email', $request->email)->first();
+        if ($user) {
+                $token = $user->createToken('Laravel Password Grant Client')->accessToken;
+                $response = ['token' => $token];
+        } else {
+            $request['password'] = Hash::make($request['password']);
+            $user = User::create($request->toArray());
+            $token = $user->createToken('Laravel Password Grant Client')->accessToken;
+            $response = ['token' => $token];
+        }
+
+        return response($response, 200);
+    }
+
     public function login(Request $request)
     {
 
