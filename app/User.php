@@ -48,6 +48,11 @@ class User extends Authenticatable
         return \Auth::user()->points;
     }
 
+    public function getGiftCards()
+    {
+        return $this->hasMany(GiftCard::class,'owner','id');
+    }
+
 
     /**
      * Send the password reset notification.
