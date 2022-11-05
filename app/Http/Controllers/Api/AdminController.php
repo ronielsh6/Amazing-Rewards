@@ -10,13 +10,12 @@ use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
 
     public function getGiftCards(Request $request){
-        $giftCards = Auth::user()->getGiftCards()->get();
+        $giftCards = $request->user()->getGiftCards()->get();
         return response()->json($giftCards);
     }
 
