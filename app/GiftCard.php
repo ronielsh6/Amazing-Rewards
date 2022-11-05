@@ -1,10 +1,11 @@
 <?php
 
 namespace App;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 
 
-class GiftCard
+class GiftCard extends Model
 {
     use Notifiable;
 
