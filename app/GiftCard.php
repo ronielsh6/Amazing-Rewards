@@ -2,12 +2,16 @@
 
 namespace App;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Notifications\Notifiable;
 
 
 class GiftCard extends Model
 {
-    use Notifiable;
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'gift_card';
 
     /**
      * The attributes that are mass assignable.
