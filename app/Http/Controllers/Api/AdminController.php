@@ -32,7 +32,8 @@ class AdminController extends Controller
         $request['owner'] = $request->user()->id;
         GiftCard::create($request->toArray());
         $giftCards = $request->user()->getGiftCards()->get();
-        return response()->json($giftCards, 200);
+        return response()->json([
+            'data' => $giftCards]);
     }
 
 }
