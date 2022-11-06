@@ -16,7 +16,8 @@ class AdminController extends Controller
 
     public function getGiftCards(Request $request){
         $giftCards = $request->user()->getGiftCards()->get();
-        return response()->json($giftCards);
+        return response()->json([
+            'data' => $giftCards]);
     }
 
     public function createGiftCard(Request $request)
