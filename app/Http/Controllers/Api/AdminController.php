@@ -31,6 +31,9 @@ class AdminController extends Controller
         $request['pending'] = true;
         $request['owner'] = $request->user()->id;
         GiftCard::create($request->toArray());
+        $user = User::find($request->user()->id);
+        $user->points -= $request->amount * 1000;
+        $user->save();
         $giftCards = $request->user()->getGiftCards()->get();
         return response()->json([
             'data' => $giftCards]);
