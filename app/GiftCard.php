@@ -19,7 +19,7 @@ class GiftCard extends Model
      * @var array
      */
     protected $fillable = [
-        'amount', 'status', 'claim_link', 'egifter_id', 'pending', 'owner',
+        'amount', 'status', 'claim_link', 'egifter_id','challenge_code', 'pending', 'owner',
     ];
 
 
