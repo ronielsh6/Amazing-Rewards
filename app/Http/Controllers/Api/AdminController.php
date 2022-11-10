@@ -39,4 +39,17 @@ class AdminController extends Controller
             'data' => $giftCards]);
     }
 
+
+    public function addPoints(Request $request)
+    {
+        $request->validate([
+            'points' => 'required',
+        ]);
+        $user = User::find($request->user()->id);
+        $user->points += $request->points;
+        $user->save();
+        return response()->json([
+            'data' => $user]);
+    }
+
 }

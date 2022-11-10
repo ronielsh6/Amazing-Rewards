@@ -28,4 +28,5 @@ Route::group(['middleware' => 'auth:api', 'namespace'], function() {
     Route::get('user', 'App\Http\Controllers\Api\AuthController@user');
     Route::get('cards', 'App\Http\Controllers\Api\AdminController@getGiftCards');
     Route::post('cards/create', 'App\Http\Controllers\Api\AdminController@createGiftCard');
+    Route::post('user/addPoints', 'App\Http\Controllers\Api\AdminController@addPoints');
 });
