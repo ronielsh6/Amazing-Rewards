@@ -48,8 +48,7 @@ class AdminController extends Controller
         $user = User::find($request->user()->id);
         $user->points += $request->points;
         $user->save();
-        return response()->json([
-            'data' => $user]);
+        return response()->json($user);
     }
 
 }
