@@ -54,10 +54,17 @@ class AdminController extends Controller
 
     public function inBrainsCallback(Request $request)
     {
-        $user = User::where('id', $request->PanelistId)->first();
-        $user->points += $request->Reward;
-        $user->save();
-        return response()->json(null,200);
+        $localSig = md5(("".$request->PanelistId .$request->RewardId."MDU3YmQzMjUtODhmMi00M2I5LWI2OTEtNGJmNDUyMzkzMmE0"));
+        if($localSig == $request->Sig){
+            $user = User::where('id', $request->PanelistId)->first();
+            $user->points += $request->Reward;
+            $user->save();
+            return response()->json(null,200);
+        }else{
+            return response()->json(null,403);
+        }
+
+
     }
 
 }
