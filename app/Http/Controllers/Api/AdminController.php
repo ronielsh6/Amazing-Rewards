@@ -51,4 +51,13 @@ class AdminController extends Controller
         return response()->json($user);
     }
 
+
+    public function inBrainsCallback(Request $request)
+    {
+        $user = User::where('id', $request->PanelistId)->first();
+        $user->points += $request->Reward;
+        $user->save();
+        return response()->json(null,200);
+    }
+
 }

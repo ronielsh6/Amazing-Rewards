@@ -23,6 +23,7 @@ Route::group(['prefix' => 'auth'], function () {
     Route::post('signup', 'App\Http\Controllers\Api\AuthController@signup');
     Route::post('googleAuth', 'App\Http\Controllers\Api\AuthController@googleAuth');
 });
+Route::post('inbrainCallback','App\Http\Controllers\Api\AdminController@inBrainsCallback');
 Route::group(['middleware' => 'auth:api', 'namespace'], function() {
     Route::get('logout', 'App\Http\Controllers\Api\AuthController@logout');
     Route::get('user', 'App\Http\Controllers\Api\AuthController@user');
