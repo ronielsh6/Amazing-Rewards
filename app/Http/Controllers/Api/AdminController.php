@@ -25,9 +25,10 @@ class AdminController extends Controller
     private function getAuthToken()
     {
         $response = Http::withHeaders([
-            'AccessToken' => '03b9nsl27htc939st11nt0sh1r080rtfr930th6d9d02n16381cl1tt29rk89t2s',
+//            'AccessToken' => '03b9nsl27htc939st11nt0sh1r080rtfr930th6d9d02n16381cl1tt29rk89t2s',
+            'AccessToken' => '0cl95sh0n20bl10t9330nt2cl97r0nt30n0n7r92d1sc120b9t931nt1rt0bl9v2',
             'Email' => 'info@myamazingrewards.com'
-        ])->post('https://stage-rewards-api.egifter.com/v1/Tokens');
+        ])->post('https://rewards-api.egifter.com/v1/Tokens');
 
         return $response->json("value");
     }
@@ -47,7 +48,7 @@ class AdminController extends Controller
 
         $response = Http::withHeaders([
             'Authorization' => 'Bearer '.$token
-        ])->post('https://stage-rewards-api.egifter.com/v1/Orders',
+        ])->post('https://rewards-api.egifter.com/v1/Orders',
             ['lineItems' => [[
                 'productId' => 'AMAZON',
                 'quantity' => 1,
