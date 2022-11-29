@@ -65,9 +65,8 @@ class AdminController extends Controller
                 'note' => $request->note
             ]);
 
-        dd($response->body());
 
-        return $response;
+        return $response->body();
     }
 
     public function createGiftCard(Request $request)
