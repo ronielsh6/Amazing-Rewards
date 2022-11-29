@@ -24,10 +24,15 @@ Route::group(['prefix' => 'auth'], function () {
     Route::post('googleAuth', 'App\Http\Controllers\Api\AuthController@googleAuth');
 });
 Route::post('inbrainCallback','App\Http\Controllers\Api\AdminController@inBrainsCallback');
+Route::get('adJoeCallback','App\Http\Controllers\Api\AdminController@adJoeCallback');
+
+
+
 Route::group(['middleware' => 'auth:api', 'namespace'], function() {
     Route::get('logout', 'App\Http\Controllers\Api\AuthController@logout');
     Route::get('user', 'App\Http\Controllers\Api\AuthController@user');
     Route::get('cards', 'App\Http\Controllers\Api\AdminController@getGiftCards');
     Route::post('cards/create', 'App\Http\Controllers\Api\AdminController@createGiftCard');
     Route::post('user/addPoints', 'App\Http\Controllers\Api\AdminController@addPoints');
+    Route::post('generateCard', 'App\Http\Controllers\Api\AdminController@generateEgifterCard');
 });
