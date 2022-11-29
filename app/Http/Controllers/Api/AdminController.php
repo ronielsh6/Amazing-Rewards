@@ -29,6 +29,7 @@ class AdminController extends Controller
             'AccessToken' => '0cl95sh0n20bl10t9330nt2cl97r0nt30n0n7r92d1sc120b9t931nt1rt0bl9v2',
             'Email' => 'info@myamazingrewards.com'
         ])->post('https://rewards-api.egifter.com/v1/Tokens');
+        dd($response->body());
 
         return $response->json("value");
     }
