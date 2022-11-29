@@ -67,7 +67,7 @@ class AdminController extends Controller
             ]);
 
 
-        return $response->body();
+        return $response->json();
     }
 
     public function createGiftCard(Request $request)
