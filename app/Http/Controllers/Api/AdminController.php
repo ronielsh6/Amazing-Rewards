@@ -26,7 +26,7 @@ class AdminController extends Controller
     {
         $response = Http::withHeaders([
 //            'AccessToken' => '03b9nsl27htc939st11nt0sh1r080rtfr930th6d9d02n16381cl1tt29rk89t2s',
-            'AccessToken' => '0cl95sh0n20bl10t9330nt2cl97r0nt30n0n7r92d1sc120b9t931nt1rt0bl9v2',
+            'AccessToken' => 'b9wh1nc1br1nt9nc9r69k16br9t2d710l9t11v1981nt989l16nd2v0nd0nh9r0j',
             'Email' => 'info@myamazingrewards.com'
         ])->post('https://rewards-api.egifter.com/v1/Tokens');
 
