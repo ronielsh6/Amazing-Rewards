@@ -25,7 +25,7 @@ class AuthController extends Controller
         $response = ['token' => $token];
         $user->referral_code = $this->generateUniqueCode();
         $user->save();
-        if(User::where('referral_code', $request->referrer_code)->exists()){
+        if(!empty($request->referrer_code) && User::where('referral_code', $request->referrer_code)->exists()){
             $userReferrer = User::where('referral_code', $request->referrer_code)->first();
             $userReferrer->points = $userReferrer->points + 200;
             $user->points = $user->points + 200;
