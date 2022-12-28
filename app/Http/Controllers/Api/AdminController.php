@@ -101,6 +101,21 @@ class AdminController extends Controller
         return response()->json($user);
     }
 
+    public function getUserReferralCode(Request $request){
+
+        $user = User::find($request->user()->id);
+        $code = $user->referral_code;
+        if ($code == null){
+            $user->referral_code = $this->generateUniqueCode();
+            $user->save();
+            return response()->json([
+                'data' => $user->referral_code]);
+        }
+        $user->points += $request->points;
+
+        return response()->json($user);
+    }
+
 
     public function inBrainsCallback(Request $request)
     {
@@ -114,6 +129,29 @@ class AdminController extends Controller
             return response()->json(null, 403);
         }
     }
+
+    public function generateUniqueCode()
+    {
+
+        $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersNumber = strlen($characters);
+        $codeLength = 6;
+
+        $code = "";
+
+        while (strlen($code) < 6) {
+            $position = rand(0, $charactersNumber - 1);
+            $character = $characters[$position];
+            $code = $code.$character;
+        }
+
+        if (User::where('referral_code', $code)->exists()) {
+            $this->generateUniqueCode();
+        }
+
+        return $code;
+    }
+
 
     public function adJoeCallback(Request $request)
     {

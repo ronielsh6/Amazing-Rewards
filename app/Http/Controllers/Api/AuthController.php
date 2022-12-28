@@ -23,7 +23,38 @@ class AuthController extends Controller
         $user = User::create($request->toArray());
         $token = $user->createToken('Laravel Password Grant Client')->accessToken;
         $response = ['token' => $token];
+        $user->referral_code = $this->generateUniqueCode();
+        $user->save();
+        if(User::where('referral_code', $request->referrer_code)->exists()){
+            $userReferrer = User::where('referral_code', $request->referrer_code)->first();
+            $userReferrer->points = $userReferrer->points + 200;
+            $user->points = $user->points + 200;
+            $userReferrer->save();
+            $user->save();
+        }
         return response($response, 200);
+    }
+
+    private function generateUniqueCode()
+    {
+
+        $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersNumber = strlen($characters);
+        $codeLength = 6;
+
+        $code = "";
+
+        while (strlen($code) < 6) {
+            $position = rand(0, $charactersNumber - 1);
+            $character = $characters[$position];
+            $code = $code.$character;
+        }
+
+        if (User::where('referral_code', $code)->exists()) {
+            $this->generateUniqueCode();
+        }
+
+        return $code;
     }
 
     public function googleAuth(Request $request)
@@ -87,7 +118,11 @@ class AuthController extends Controller
 
     public function user(Request $request)
     {
-
+        $user = User::find($request->user()->id);
+        if (empty($user->referral_code)){
+            $user->referral_code = $this->generateUniqueCode();
+            $user->save();
+        }
         return response()->json($request->user());
     }
 
