@@ -66,6 +66,8 @@ class AdminController extends Controller
                 'note' => $request->note
             ]);
 
+            dd($response->json());
+
 
         return $response->json();
     }
