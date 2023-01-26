@@ -38,7 +38,7 @@ class AdminController extends Controller
         $request->validate([
             'value' => 'required',
             'email' => 'required',
-            'name' => 'required',
+            // 'name' => 'required',
             'poNumber' => 'required',
             'note' => 'required',
         ]);
