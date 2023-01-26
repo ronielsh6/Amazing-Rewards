@@ -41,7 +41,10 @@ class AdminController extends Controller
             'poNumber' => 'required',
             'note' => 'required',
         ]);
-
+        $name = $request->name;
+        if($name == null){
+           $name = $request->email;
+        }
 
         $token = $this->getAuthToken();
 
@@ -57,7 +60,7 @@ class AdminController extends Controller
                 ],
                 'personalization' => [
                     'fromName' => 'Amazing Rewards',
-                    'to' => $request->name
+                    'to' => $name
                 ]
             ]],
                 'poNumber' => $request->poNumber,
