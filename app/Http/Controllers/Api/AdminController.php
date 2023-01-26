@@ -38,7 +38,6 @@ class AdminController extends Controller
         $request->validate([
             'value' => 'required',
             'email' => 'required',
-            // 'name' => 'required',
             'poNumber' => 'required',
             'note' => 'required',
         ]);
@@ -65,8 +64,6 @@ class AdminController extends Controller
                 'type' => 'Links',
                 'note' => $request->note
             ]);
-
-            dd($response->json());
 
 
         return $response->json();
