@@ -174,16 +174,6 @@ class AdminController extends Controller
 
     public function getEgifterOrders(Request $request)
     {
-        $request->validate([
-            'value' => 'required',
-            'email' => 'required',
-            'poNumber' => 'required',
-            'note' => 'required',
-        ]);
-        $name = $request->name;
-        if($name == null){
-           $name = $request->email;
-        }
 
         $token = $this->getAuthToken();
 
