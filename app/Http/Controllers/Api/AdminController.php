@@ -179,7 +179,7 @@ class AdminController extends Controller
 
         $response = Http::withHeaders([
             'Authorization' => 'Bearer '.$token
-        ])->get('https://rewards-api.egifter.com/v1/Orders');
+        ])->get('https://rewards-api.egifter.com/v1/Orders?pageSize=20');
 
 
         return $response->json();
