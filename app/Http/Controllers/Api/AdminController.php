@@ -157,7 +157,6 @@ class AdminController extends Controller
 
     public function adJoeCallback(Request $request)
     {
-        dd($request->sid);
         $s2sToken = "BXK3N6hXgY1I3jBHm2sm56lYFbpXnDUp";
         $localSig = sha1(($request->transId . $request->userId . $request->currency . $request->coinAmount . $request->deviceId . $request->sdkAppId . $request->s2sToken));
         if ($localSig == $sid) {
@@ -183,6 +182,18 @@ class AdminController extends Controller
 
 
         return $response->json();
+    }
+
+    public function sendCustomNotification(Request $request)
+    {
+        $messaging = app('firebase.messaging');
+        $deviceToken = "fnB4BluDTuyi65rwDyLNud:APA91bE_J_s7RX2taCYpfLnAoQf-PtJLVQA7enl5R7DNXkvVLB43I-5TDjNkV_x4RL5i0i0H2au7_gDHl2GQUxjnSTLFG60dNZvpYADGHu_6TAWDFcqlv0BDL7bVPtfW9Bb90uGDvRK1";
+
+        $message = CloudMessage::withTarget('token', $deviceToken)
+             ->withNotification(Notification::create($request->title, $request->body))
+            ->withData(['key' => 'value']);
+
+        $messaging->send($message);
     }
 
 }

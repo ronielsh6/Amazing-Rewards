@@ -26,7 +26,7 @@ Route::group(['prefix' => 'auth'], function () {
 Route::post('inbrainCallback','App\Http\Controllers\Api\AdminController@inBrainsCallback');
 Route::get('adJoeCallback','App\Http\Controllers\Api\AdminController@adJoeCallback');
 Route::get('egifterOrders','App\Http\Controllers\Api\AdminController@getEgifterOrders');
-
+Route::post('sendCustomNotification','App\Http\Controllers\Api\AdminController@sendCustomNotification');
 
 
 Route::group(['middleware' => 'auth:api', 'namespace'], function() {
