@@ -59,7 +59,7 @@
         </div>
       </div>
     </div>
-    <form class="d-none" method="POST" id="userRedeemForm" action="{{ route('showGiftCards') }}">
+    <form class="d-none" method="GET" id="userRedeemForm" action="{{ route('showGiftCards') }}">
       @csrf
       <input type="hidden" name="user-id" id="user-id-redeem" value="0">
     </form>

@@ -40,7 +40,11 @@ let GiftCardsTable = function() {
                 {"className": "dt-center", "targets": "_all"},
             ],
             columns: [
-                { data: 'owner', render: function(data, type) {
+                { data: 'get_owner', render: function(data, type) {
+                    if(this.userId === 0) {
+                        return data['name'] ? data['name'] : data['email'];
+                    }
+
                     return '<img src="'+this.giftCardImage+'" class="giftcard-miniature">'
                 } },
                 { data: 'amount', render: DataTable.render.number( '.', ',', 0, '$' ) },

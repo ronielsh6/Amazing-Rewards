@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\GiftCard;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -90,15 +91,9 @@ class HomeController extends Controller
         $userId = $request->get('userId');
         $start = $request->get('start');
         $page = $request->get('length');
-        $giftCardsQuery = DB::table('gift_card');
+        $giftCardsQuery = GiftCard::with(['getOwner']);
         if(!empty($userId) && $userId !==0 ){
             $giftCardsQuery->where('owner', $userId);
-        } else {
-            return response()->json([
-                'data' => [],
-                'recordsTotal'=> 0,
-                'recordsFiltered' => 0
-            ]);
         }
 
         $giftCardsQuery->offset($start*$page)->limit($page);

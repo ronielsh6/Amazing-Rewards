@@ -69,7 +69,7 @@
     <script>
         GiftCardsTable.setUri('{{ route('getGiftCards') }}');
         GiftCardsTable.setRedeemUri('{{ route('enableGiftcard') }}');
-        GiftCardsTable.setUserId({{ $userId}}, "{{ asset('assets/img/giftcard.png') }}");
+        GiftCardsTable.setUserId({{ $userId ?? 0}}, "{{ asset('assets/img/giftcard.png') }}");
         GiftCardsTable.init();
     </script>
 @endsection
