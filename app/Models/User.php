@@ -22,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'admin'
     ];
 
     /**
@@ -46,5 +47,10 @@ class User extends Authenticatable
     public function getGiftCards()
     {
         return $this->hasMany(GiftCard::class,'owner','id');
+    }
+
+    public function isAdmin()
+    {
+        return $this->attributes['admin'] === 1;
     }
 }

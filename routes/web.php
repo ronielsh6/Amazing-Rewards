@@ -17,5 +17,18 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('auth.login');
 });
-Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
+
+Auth::routes([
+    'register' => false, // Registration Routes...
+    'reset' => false, // Password Reset Routes...
+    'verify' => false, // Email Verification Routes...
+  ]);
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/users', [App\Http\Controllers\HomeController::class, 'getUsers'])->name('getUsers');
+Route::post('/user/delete', [App\Http\Controllers\HomeController::class, 'deleteUsers'])->name('deleteUser');
+
+Route::post('/user/giftcards', [App\Http\Controllers\HomeController::class, 'getUserGiftCards'])->name('showGiftCards');
+Route::get('/giftcards', [App\Http\Controllers\HomeController::class, 'getGiftCards'])->name('getGiftCards');
+Route::post('/giftcards/enable', [App\Http\Controllers\HomeController::class, 'getEnabledGiftCard'])->name('enableGiftcard');

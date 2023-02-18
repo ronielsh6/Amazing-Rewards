@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Promotion;
-use Carbon\Carbon;
+use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use GuzzleHttp\Client;
+use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
@@ -18,6 +16,7 @@ class HomeController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware('role');
     }
 
     /**
@@ -25,9 +24,123 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-
     public function index()
     {
         return view('home');
+    }
+
+    public function getUsers(Request $request)
+    {
+        $start = $request->get('start');
+        $page = $request->get('length');
+        $username = $request->get('username');
+        $relative = $request->get('relative');
+        $points = $request->get('points');
+        $usersQuery = DB::table('users')->offset($start*$page)
+            ->limit($page);
+        
+        if(!empty($username)) {
+            $usersQuery->where(function($query) use ($username){
+                $query->where('name', 'like', '%'. $username .'%')
+                ->orWhere('email', 'like', '%'. $username .'%');
+            });
+        }
+
+        if(!empty($points)) {
+            $between = \explode(',', $points);
+            if(\count($between) > 1) {
+                $usersQuery->whereBetween('points', $between);
+            }
+
+            if(\count($between) === 1) {
+                $usersQuery->where('points', $relative, $points);
+            }
+        }
+        $users = $usersQuery->get()->toArray();
+        $total = DB::table('users')->get()->count();
+        return response()->json([
+            'data' => $users,
+            'recordsTotal'=> $total,
+            'recordsFiltered' => \count($users)
+        ]);
+    }
+
+    public function deleteUsers(Request $request)
+    {
+        $userId = $request->get('user');
+        $user = User::find($userId);
+        $user->delete();
+
+        return response()->json([
+            'code' => 200,
+            'message' => 'User deleted sucessfully'
+        ]);
+    }
+
+    public function getUserGiftCards(Request $request)
+    {
+        $userId = $request->get('user-id');
+        return view('giftCards', [
+            'userId' => $userId
+        ]);
+    }
+
+    public function getGiftCards(Request $request)
+    {
+        $userId = $request->get('userId');
+        $start = $request->get('start');
+        $page = $request->get('length');
+        $giftCardsQuery = DB::table('gift_card');
+        if(!empty($userId) && $userId !==0 ){
+            $giftCardsQuery->where('owner', $userId);
+        } else {
+            return response()->json([
+                'data' => [],
+                'recordsTotal'=> 0,
+                'recordsFiltered' => 0
+            ]);
+        }
+
+        $giftCardsQuery->offset($start*$page)->limit($page);
+        $giftcards = $giftCardsQuery->get()->toArray();
+        $totalGiftCardsForUser = DB::table('gift_card')->where('owner', $userId)->get()->count();
+        return response()->json([
+            'data' => $giftcards,
+            'recordsTotal'=> $totalGiftCardsForUser,
+            'recordsFiltered' => \count($giftcards)
+        ]);
+    }
+
+    public function getEnabledGiftCard(Request $request)
+    {
+        $giftcard = $request->get('card');
+        $user = $request->get('userId');
+
+        $giftCardItem = DB::table('gift_card')->where('id', $giftcard)
+                ->where('owner', $user)->get();
+
+        if(!$giftCardItem) {
+            return response()->json([
+                'code' => 400,
+                'message' => 'Data error'
+            ]);
+        }
+
+        $affectedRows = DB::table('gift_card')->where('id', $giftcard)
+                ->where('owner', $user)
+                ->update(['pending' => 0]);
+
+        if($affectedRows > 0) {
+            return response()->json([
+                'code' => 200,
+                'message' => 'Gift Card was activated sucessfully.'
+            ]);
+        }
+
+        return response()->json([
+            'code' => 400,
+            'message' => 'Data error'
+        ]);
+
     }
 }

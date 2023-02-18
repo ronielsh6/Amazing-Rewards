@@ -196,4 +196,9 @@ class AdminController extends Controller
         $messaging->send($message);
     }
 
+    public function getUsers(Request $request)
+    {
+        dd('aqui estoy llegando');
+    }
+
 }
