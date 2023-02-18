@@ -37,8 +37,10 @@ class HomeController extends Controller
         $username = $request->get('username');
         $relative = $request->get('relative');
         $points = $request->get('points');
-        $usersQuery = DB::table('users')->offset($start*$page)
-            ->limit($page);
+        $usersQuery = DB::table('users')->limit($page);
+        if($page >= 0) {
+            $usersQuery->offset($start*$page);
+        }
         
         if(!empty($username)) {
             $usersQuery->where(function($query) use ($username){
@@ -96,7 +98,10 @@ class HomeController extends Controller
             $giftCardsQuery->where('owner', $userId);
         }
 
-        $giftCardsQuery->offset($start*$page)->limit($page);
+        if($page >= 0) {
+            $giftCardsQuery->offset($start*$page);
+        }
+        $giftCardsQuery->limit($page);
         $giftcards = $giftCardsQuery->get()->toArray();
         $totalGiftCardsForUser = DB::table('gift_card')->where('owner', $userId)->get()->count();
         return response()->json([
