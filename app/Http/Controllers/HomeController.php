@@ -37,11 +37,14 @@ class HomeController extends Controller
         $username = $request->get('username');
         $relative = $request->get('relative');
         $points = $request->get('points');
+        $orderElement = $request->get('order')[0];
+        $orderDir = $orderElement['dir'];
+        $column = $request->get('columns')[$orderElement['column']]['data'];
         $usersQuery = DB::table('users')->limit($page);
         if($page >= 0) {
             $usersQuery->offset($start*$page);
         }
-        
+
         if(!empty($username)) {
             $usersQuery->where(function($query) use ($username){
                 $query->where('name', 'like', '%'. $username .'%')
@@ -59,6 +62,7 @@ class HomeController extends Controller
                 $usersQuery->where('points', $relative, $points);
             }
         }
+        $usersQuery->orderBy($column, $orderDir);
         $users = $usersQuery->get()->toArray();
         $total = DB::table('users')->get()->count();
         return response()->json([
@@ -141,6 +145,10 @@ class HomeController extends Controller
             'code' => 400,
             'message' => 'Data error'
         ]);
+    }
 
+    public function sendMessages(Request $request)
+    {
+        dd('aaaaaaa');
     }
 }
