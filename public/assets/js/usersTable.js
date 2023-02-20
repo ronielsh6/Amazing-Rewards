@@ -1,7 +1,7 @@
 let UsersTable = function() {
     let dataUri = '';
     let deleteUri = '';
-    let redeemUri = '';
+    let sendMessageUri = '';
 
     let setUri = function(dataUri) {
         this.dataUri =dataUri;
@@ -11,8 +11,8 @@ let UsersTable = function() {
         this.deleteUri = deleteUri;
     }
 
-    let setRedeemUri = function(redeemUri) {
-        this.redeemUri = redeemUri;
+    let setSendMessageUri = function(sendMessageUri) {
+        this.sendMessageUri = sendMessageUri;
     }
 
     let declare = function(){
@@ -38,7 +38,8 @@ let UsersTable = function() {
             },
             columnDefs: [
                 {"className": "dt-center", "targets": "_all"},
-                {"className": "dt-center", "targets": "updated_at", render: DataTable.render.datetime()}
+                {"className": "dt-center", "targets": "updated_at", render: DataTable.render.datetime()},
+                { 'orderable': false, targets: [4] }
             ],
             columns: [
                 { data: 'name' },
@@ -46,7 +47,7 @@ let UsersTable = function() {
                 { data: 'points' },
                 { data: 'updated_at' },
                 { data: 'id', render: function(data, type) {
-                    return "<a class='btn btn-warning'><i class='material-icons opacity-10'>redeem</i></a><a class='btn btn-danger'><i class='material-icons opacity-10'>delete</i></a>"
+                    return "<a class='btn btn-warning text-white'><i class='material-icons opacity-10'>redeem</i></a><a class='btn btn-danger text-white'><i class='material-icons opacity-10'>delete</i></a>"
                 }}
             ],
             filter: false,
@@ -62,6 +63,29 @@ let UsersTable = function() {
             datatable.ajax.reload();
         });
 
+        $('#sendMessage').on('click', function() {
+            $('#messageModal').modal('show');
+        });
+
+        $('.send-messages').on('click', function() {
+            debugger
+            let $ueri = this.sendMessageUri;
+            let title = $('#messageTitle').val();
+            let body = $('#messageBody').val();
+            let postData = {
+                _token: getCsrfToken(),
+                title: title,
+                body: body
+            };
+            $.post(this.sendMessageUri, postData, function(data) {
+                if(data['code'] === 200) {
+                    $('.toast-body').html(data['message']);
+                    $('.toast').toast('show');
+                    datatable.ajax.reload();
+                }
+            });
+        });
+
         $('#usersTable tbody').on('click', 'a', function() {
             var data = datatable.row( $(this).parents('tr') ).data();
             let $class = this.classList;
@@ -74,21 +98,29 @@ let UsersTable = function() {
 
         let deleteElement = function(data) {
             let username = data['name'] !== '' ? data['name'] : data['email'];
-            let response = confirm('Are you sure that you want to delete the user '+username);
-            if(response) {
-                postData = {
+            ezBSAlert({
+                type: "confirm",
+                messageText: "Are you sure you want to delete the user "+username,
+                alertType: "danger"
+            }).done(function (e) {
+                if (e) {
+                    sendDelete(data);
+                }
+            });
+        }
+
+        let sendDelete = function (data) {
+                let postData = {
                     _token: getCsrfToken(),
                     user: data['id']
                 }
                 $.post(this.deleteUri, postData, function(data) {
-                    debugger
-                    if(data['code'] == 200) {
+                    if(data['code'] === 200) {
                         $('.toast-body').html(data['message']);
                         $('.toast').toast('show');
                         datatable.ajax.reload();
                     }
-                })
-            }
+                });
         }
 
         let watchRedeem = function(id) {
@@ -108,8 +140,8 @@ let UsersTable = function() {
         setDeleteUri: function(deleteUri) {
             setDeleteUri(deleteUri);
         },
-        setRedeemUri: function(redeemUri) {
-            setRedeemUri(redeemUri);
+        setSendMessageUri: function(sendMessageUri) {
+            setSendMessageUri(sendMessageUri);
         }
     }
 }();

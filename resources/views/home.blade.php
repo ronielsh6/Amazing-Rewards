@@ -35,20 +35,23 @@
                             <input type="number" class="form-control form-custom" id="pointsInput" placeholder="Points" style="float: left">
                         </div>
                     </div>
-                    <div class="col-2">
-                        <a class="btn btn-primary" id="filterData">Filter</a>
+                    <div class="col-1">
+                        <a class="btn btn-primary text-white" id="filterData">Filter</a>
                     </div>
-                </div> 
+                    <div class="col-2">
+                        <a class="btn btn-warning text-white" id="sendMessage">Send Message</a>
+                    </div>
+                </div>
             </div>
             <div class="p-0 col-12">
               <table class="table align-items-center mb-0" id="usersTable">
                 <thead>
                   <tr>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Name</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Email</th>
-                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Points</th>
-                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Last connection at</th>
-                    <th class="text-secondary opacity-7"></th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Points</th>
+                    <th>Last connection at</th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -78,6 +81,15 @@
         </div>
       </div>
     </div>
+
+    @include('partials.modal', [
+    'modalId' => 'messageModal',
+    'modalTitle' => 'Notification message',
+    'modalButtonId' => 'send-messages',
+    'modalButtonText' => 'Send messages',
+    'body' => 'usersView.modalUsers',
+    'color' => 'success'
+    ] )
   </div>
 </div>
 @endsection
@@ -87,7 +99,7 @@
     <script>
         UsersTable.setUri('{{ route('getUsers') }}');
         UsersTable.setDeleteUri('{{ route('deleteUser') }}');
-        // UsersTable.setUri('{{ route('getUsers') }}');
+        UsersTable.setSendMessageUri('{{ route('sendMessages') }}');
         UsersTable.init();
     </script>
 @endsection

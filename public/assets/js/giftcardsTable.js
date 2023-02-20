@@ -38,6 +38,7 @@ let GiftCardsTable = function() {
             },
             columnDefs: [
                 {"className": "dt-center", "targets": "_all"},
+                { 'orderable': false, targets: [7] }
             ],
             columns: [
                 { data: 'get_owner', render: function(data, type) {
@@ -52,7 +53,7 @@ let GiftCardsTable = function() {
                     return data.charAt(0).toUpperCase() + data.slice(1);
                 } },
                 { data: 'claim_link', render: function(data, type) {
-                    return '<a href="'+data+'" target="_blank">'+data+'</a>';
+                    return '<a href="'+data+'" target="_blank">'+data.substring(0,40)+'</a>';
                 } },
                 { data: 'egifter_id' },
                 { data: 'pending', render: function(data, type) {
@@ -78,6 +79,8 @@ let GiftCardsTable = function() {
             var data = datatable.row( $(this).parents('tr') ).data();
             enableGiftCard(data);
         });
+
+
 
         let enableGiftCard = function(data) {
             debugger

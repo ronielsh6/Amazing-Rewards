@@ -22,15 +22,15 @@
               <table class="table align-items-center mb-0" id="giftcardsTable">
                 <thead>
                   <tr>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Gift Card</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Amount</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Claim Link</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Egifter</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Pending</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Created At</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Challenge Code</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"></th>
+                    <th>Gift Card</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Claim Link</th>
+                    <th>Egifter</th>
+                    <th>Pending</th>
+                    <th>Created At</th>
+                    <th>Challenge Code</th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
