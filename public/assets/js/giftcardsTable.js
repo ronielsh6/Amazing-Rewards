@@ -83,7 +83,6 @@ let GiftCardsTable = function() {
 
 
         let enableGiftCard = function(data) {
-            debugger
             let response = confirm('Are you sure that you want to enable a gift card with a value of $'+data['amount']+'?');
             if(response) {
                 postData = {
@@ -92,7 +91,6 @@ let GiftCardsTable = function() {
                     userId: this.userId
                 }
                 $.post(this.redeemUri, postData, function(data) {
-                    debugger
                     if(data['code'] == 200) {
                         $('.toast-body').html(data['message']);
                         $('.toast').toast('show');

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\GiftCard;
 use App\Models\User;
+use App\Services\CloudMessages;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -149,6 +150,12 @@ class HomeController extends Controller
 
     public function sendMessages(Request $request)
     {
-        dd('aaaaaaa');
+        $title = $request->get('title');
+        $body = $request->get('body');
+        $ids = $request->get('users');
+        foreach ($ids as $id) {
+            $user = User::find($id);
+            (new CloudMessages())->sendMessage($title, $body, $user);
+        }
     }
 }

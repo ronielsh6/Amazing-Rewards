@@ -21,7 +21,7 @@
             <div class="row mr-5 ml-5">
                 <div class="row filters">
                     <div class="col-2">
-                        <input type="text" class="form-control form-custom" id="usernameInput" placeholder="Username">
+                        <input type="text" class="form-control form-custom text-center" id="usernameInput" placeholder="Username">
                     </div>
                     <div class="row col-4">
                         <div class="col-4">
@@ -32,7 +32,7 @@
                             </select>
                         </div>
                         <div class="col-8">
-                            <input type="number" class="form-control form-custom" id="pointsInput" placeholder="Points" style="float: left">
+                            <input type="number" class="form-control form-custom text-center" id="pointsInput" placeholder="Points" style="float: left">
                         </div>
                     </div>
                     <div class="col-1">

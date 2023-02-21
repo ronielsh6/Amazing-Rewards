@@ -6,3 +6,4 @@
     <label for="messageBody">Message body</label>
     <textarea name="messageBody" id="messageBody" class="form-control form-custom" rows="10"></textarea>
 </div>
+<input type="hidden" value="{{ route('sendMessages') }}" id="messagesRoute">

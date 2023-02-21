@@ -68,16 +68,20 @@ let UsersTable = function() {
         });
 
         $('.send-messages').on('click', function() {
-            debugger
-            let $ueri = this.sendMessageUri;
+            let uri = $('#messagesRoute').val();
             let title = $('#messageTitle').val();
             let body = $('#messageBody').val();
+            let data = datatable.rows().data();
+            let ids = jQuery.map(data, function (item) {
+                return item['id'];
+            })
             let postData = {
                 _token: getCsrfToken(),
                 title: title,
-                body: body
+                body: body,
+                users: ids
             };
-            $.post(this.sendMessageUri, postData, function(data) {
+            $.post(uri, postData, function(data) {
                 if(data['code'] === 200) {
                     $('.toast-body').html(data['message']);
                     $('.toast').toast('show');
