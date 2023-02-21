@@ -99,7 +99,7 @@
     <script>
         UsersTable.setUri('{{ route('getUsers') }}');
         UsersTable.setDeleteUri('{{ route('deleteUser') }}');
-        UsersTable.setSendMessageUri('{{ route('sendMessages') }}');
+        // UsersTable.setSendMessageUri('{{ route('sendMessages') }}');
         UsersTable.init();
     </script>
 @endsection
