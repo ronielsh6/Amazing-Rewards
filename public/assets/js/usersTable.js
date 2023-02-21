@@ -101,7 +101,7 @@ let UsersTable = function() {
         });
 
         let deleteElement = function(data) {
-            let username = data['name'] !== '' ? data['name'] : data['email'];
+            let username = data['email'];
             ezBSAlert({
                 type: "confirm",
                 messageText: "Are you sure you want to delete the user "+username,

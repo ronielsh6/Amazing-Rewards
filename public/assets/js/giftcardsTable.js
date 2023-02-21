@@ -53,7 +53,7 @@ let GiftCardsTable = function() {
                     return data.charAt(0).toUpperCase() + data.slice(1);
                 } },
                 { data: 'claim_link', render: function(data, type) {
-                    return '<a href="'+data+'" target="_blank">'+data.substring(0,40)+'</a>';
+                    return '<a href="'+data+'" target="_blank">'+data.substring(0,25)+'</a>';
                 } },
                 { data: 'egifter_id' },
                 { data: 'pending', render: function(data, type) {
