@@ -36,4 +36,5 @@ Route::group(['middleware' => 'auth:api', 'namespace'], function() {
     Route::post('cards/create', 'App\Http\Controllers\Api\AdminController@createGiftCard');
     Route::post('user/addPoints', 'App\Http\Controllers\Api\AdminController@addPoints');
     Route::post('generateCard', 'App\Http\Controllers\Api\AdminController@generateEgifterCard');
+    Route::post('user/updateFcmToken', 'App\Http\Controllers\Api\AdminController@updateFcmToken');
 });

@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use DateTime;
 use Illuminate\Support\Facades\Http;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Messaging\Notification;
@@ -118,6 +119,17 @@ class AdminController extends Controller
         $user->points += $request->points;
 
         return response()->json($user);
+    }
+
+    public function updateFcmToken(Request $request){
+        $user = User::find($request->user()->id);
+        if($user->fcm_token == null){
+            $user->fcm_token = $request->fcm_token;
+        }
+            $user->touch();
+            $user->save();
+            return response()->json([
+                'data' => $user->updated_at]);
     }
 
 
