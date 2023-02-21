@@ -172,10 +172,10 @@ class AdminController extends Controller
     public function adJoeCallback(Request $request)
     {
         $s2sToken = "BXK3N6hXgY1I3jBHm2sm56lYFbpXnDUp";
-        $localSig = sha1(($request->transId . $request->userId . $request->currency . $request->coinAmount . $request->deviceId . $request->sdkAppId . $request->s2sToken));
-        if ($localSig == $sid) {
-            $user = User::where('id', $userId)->first();
-            $user->points += $coinAmount;
+        $localSig = sha1(($request->transId . $request->userId . $request->currency . $request->coinAmount . $request->deviceId . $request->sdkAppId . $s2sToken));
+        if ($localSig == $request->sid) {
+            $user = User::where('id', $request->userId)->first();
+            $user->points += $request->coinAmount;
             $user->save();
             return response()->json(null, 200);
         } else {
