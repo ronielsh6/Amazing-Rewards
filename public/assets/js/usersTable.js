@@ -47,13 +47,14 @@ let UsersTable = function() {
                 { data: 'points' },
                 { data: 'updated_at' },
                 { data: 'id', render: function(data, type) {
-                    return "<a class='btn btn-warning text-white'><i class='material-icons opacity-10'>redeem</i></a><a class='btn btn-danger text-white'><i class='material-icons opacity-10'>delete</i></a>"
+                    return "<a class='btn btn-success text-white'><i class='material-icons opacity-10'>send</i></a><a class='btn btn-warning text-white'><i class='material-icons opacity-10'>redeem</i></a><a class='btn btn-danger text-white'><i class='material-icons opacity-10'>delete</i></a>"
                 }}
             ],
             filter: false,
             paging: true,
             processing: true,
             serverSide: true,
+            pagingType: 'full_numbers',
             ordering: true,
             lengthMenu: [[50, 100, 200, -1], [50, 100, 200, 'ALL']],
             DisplayLenght: 100,
@@ -72,9 +73,15 @@ let UsersTable = function() {
             let title = $('#messageTitle').val();
             let body = $('#messageBody').val();
             let data = datatable.rows().data();
-            let ids = jQuery.map(data, function (item) {
-                return item['id'];
-            })
+            let $customId = parseInt($('#customId').val());
+            let ids = [];
+            if ($customId === 0 ) {
+                ids = jQuery.map(data, function (item) {
+                    return item['id'];
+                });
+            } else {
+                ids = [$customId];
+            }
             let postData = {
                 _token: getCsrfToken(),
                 title: title,
@@ -83,11 +90,32 @@ let UsersTable = function() {
             };
             $.post(uri, postData, function(data) {
                 if(data['code'] === 200) {
-                    $('.toast-body').html(data['message']);
-                    $('.toast').toast('show');
-                    datatable.ajax.reload();
+                    $('#messageModal').modal('hide');
+                    if(data['errors']) {
+                        let message = 'There was a problem sending the message. Please check the logs.';
+                        $.toast({
+                            heading: 'Notification',
+                            text: message,
+                            showHideTransition: 'slide',
+                            icon: 'warning',
+                            position: 'bottom-right',
+                            stack: true,
+                            hideAfter: 10000
+                        });
+                    } else {
+                        $.toast({
+                            heading: 'Notification',
+                            text: 'Message send successfully.',
+                            showHideTransition: 'slide',
+                            icon: 'success',
+                            position: 'bottom-right',
+                            stack: true,
+                            hideAfter: 10000
+                        });
+                    }
                 }
             });
+            $('#customId').val(0);
         });
 
         $('#usersTable tbody').on('click', 'a', function() {
@@ -95,22 +123,29 @@ let UsersTable = function() {
             let $class = this.classList;
             if(jQuery.inArray('btn-warning', $class) !== -1){
                 watchRedeem(data['id']);
-            }else {
+            }
+            if(jQuery.inArray('btn-danger', $class) !== -1){
                 deleteElement(data);
+            }
+            if(jQuery.inArray('btn-success', $class) !== -1){
+                $('#customId').val(data['id']);
+                $('#messageModal').modal('show');
             }
         });
 
         let deleteElement = function(data) {
-            let username = data['email'];
-            ezBSAlert({
-                type: "confirm",
-                messageText: "Are you sure you want to delete the user "+username,
-                alertType: "danger"
-            }).done(function (e) {
-                if (e) {
-                    sendDelete(data);
-                }
-            });
+            swal({
+                title: "Are you sure?",
+                text: "Once deleted, you will not be able to recover this user!",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+                .then((willDelete) => {
+                    if (willDelete) {
+                        sendDelete(data);
+                    }
+                });
         }
 
         let sendDelete = function (data) {
@@ -120,9 +155,26 @@ let UsersTable = function() {
                 }
                 $.post(this.deleteUri, postData, function(data) {
                     if(data['code'] === 200) {
-                        $('.toast-body').html(data['message']);
-                        $('.toast').toast('show');
                         datatable.ajax.reload();
+                        $.toast({
+                            heading: 'Notification',
+                            text: 'User deleted successfully.',
+                            showHideTransition: 'slide',
+                            icon: 'success',
+                            position: 'bottom-right',
+                            stack: true,
+                            hideAfter: 10000
+                        });
+                    } else {
+                        $.toast({
+                            heading: 'Notification',
+                            text: 'There was a problem.',
+                            showHideTransition: 'slide',
+                            icon: 'error',
+                            position: 'bottom-right',
+                            stack: true,
+                            hideAfter: 10000
+                        });
                     }
                 });
         }

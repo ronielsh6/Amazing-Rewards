@@ -25,7 +25,7 @@
                     </div>
                     <div class="row col-4">
                         <div class="col-4">
-                            <select id="relativeInput" class="form-control form-custom" style="float: left">
+                            <select id="relativeInput" class="form-control form-custom text-center" style="float: left">
                                 <option value=">">Points Above</option>
                                 <option value="<">Points Under</option>
                                 <option value="<>">Points Between</option>
@@ -66,21 +66,6 @@
       @csrf
       <input type="hidden" name="user-id" id="user-id-redeem" value="0">
     </form>
-    <div class="position-fixed bottom-1 end-10 z-index-2">
-      <div class="toast fade p-2 bg-white hide" role="alert" aria-live="assertive" id="successToast" aria-atomic="true">
-        <div class="toast-header border-0">
-          <i class="material-icons text-success me-2">
-            check
-          </i>
-          <span class="me-auto font-weight-bold">Amazing Rewards</span>
-          <small class="text-body">now</small>
-          <i class="fas fa-times text-md ms-3 cursor-pointer" data-bs-dismiss="toast" aria-label="Close" aria-hidden="true"></i>
-        </div>
-        <hr class="horizontal dark m-0">
-        <div class="toast-body">
-        </div>
-      </div>
-    </div>
 
     @include('partials.modal', [
     'modalId' => 'messageModal',

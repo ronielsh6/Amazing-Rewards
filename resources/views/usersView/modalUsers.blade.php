@@ -7,3 +7,4 @@
     <textarea name="messageBody" id="messageBody" class="form-control form-custom" rows="10"></textarea>
 </div>
 <input type="hidden" value="{{ route('sendMessages') }}" id="messagesRoute">
+<input type="hidden" value="0" id="customId">

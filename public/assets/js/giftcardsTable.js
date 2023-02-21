@@ -18,6 +18,11 @@ let GiftCardsTable = function() {
     }
 
     let declare = function(){
+        let notOrderColumns = [7];
+        if (this.userId !== 0) {
+            notOrderColumns.push(0);
+        }
+
         let datatable =$('#giftcardsTable').DataTable({
             language: {
                 processing: "Loading data ...",
@@ -38,7 +43,7 @@ let GiftCardsTable = function() {
             },
             columnDefs: [
                 {"className": "dt-center", "targets": "_all"},
-                { 'orderable': false, targets: [7] }
+                { 'orderable': false, targets: notOrderColumns }
             ],
             columns: [
                 { data: 'get_owner', render: function(data, type) {
@@ -58,10 +63,10 @@ let GiftCardsTable = function() {
                 { data: 'egifter_id' },
                 { data: 'pending', render: function(data, type) {
                     if(data !== 1) {
-                        return "<a class='btn btn-success' style='cursor: not-allowed; pointer-events: none'><i class='material-icons opacity-10'>check</i></a>";
+                        return "<a class='btn btn-success text-white' style='cursor: not-allowed; pointer-events: none'><i class='material-icons opacity-10'>check</i></a>";
                     }
 
-                    return "<a class='btn btn-warning'><i class='material-icons opacity-10'>cancel</i></a>"
+                    return "<a class='btn btn-warning text-white'><i class='material-icons opacity-10'>cancel</i></a>"
                 } },
                 { data: 'created_at', render: DataTable.render.datetime() },
                 { data: 'challenge_code' }
@@ -70,9 +75,10 @@ let GiftCardsTable = function() {
             paging: true,
             processing: true,
             serverSide: true,
+            order: [[1, 'asc']],
             ordering: true,
             lengthMenu: [[50, 100, 200, -1], [50, 100, 200, 'ALL']],
-            DisplayLenght: 100,
+            DisplayLenght: 50,
         });
 
         $('#giftcardsTable tbody').on('click', 'a.btn', function() {
@@ -83,21 +89,46 @@ let GiftCardsTable = function() {
 
 
         let enableGiftCard = function(data) {
-            let response = confirm('Are you sure that you want to enable a gift card with a value of $'+data['amount']+'?');
-            if(response) {
-                postData = {
-                    _token: getCsrfToken(),
-                    card: data['id'],
-                    userId: this.userId
-                }
-                $.post(this.redeemUri, postData, function(data) {
-                    if(data['code'] == 200) {
-                        $('.toast-body').html(data['message']);
-                        $('.toast').toast('show');
-                        datatable.ajax.reload();
-                    }
-                })
-            }
+            swal({
+                title: "Are you sure?",
+                text: 'Are you sure that you want to enable a gift card with a value of $'+data['amount']+'?',
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+                .then((activate) => {
+                    if (activate) {
+                        let postData = {
+                            _token: getCsrfToken(),
+                            card: data['id'],
+                            userId: this.userId !== 0 ? this.userId :  data['get_owner']['id']
+                        };
+                        $.post(this.redeemUri, postData, function(data) {
+                            if(data['code'] === 200) {
+                                $.toast({
+                                    heading: 'Notification',
+                                    text: data['message'],
+                                    showHideTransition: 'slide',
+                                    icon: 'success',
+                                    position: 'bottom-right',
+                                    stack: true,
+                                    hideAfter: 10000
+                                });
+                                datatable.ajax.reload();
+                            } else {
+                                $.toast({
+                                    heading: 'Notification',
+                                    text: data['message'],
+                                    showHideTransition: 'slide',
+                                    icon: 'error',
+                                    position: 'bottom-right',
+                                    stack: true,
+                                    hideAfter: 10000
+                                });
+                            }
+                        });
+                    };
+                });
         }
 
     }

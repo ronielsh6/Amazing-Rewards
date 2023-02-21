@@ -41,10 +41,7 @@ class HomeController extends Controller
         $orderElement = $request->get('order')[0];
         $orderDir = $orderElement['dir'];
         $column = $request->get('columns')[$orderElement['column']]['data'];
-        $usersQuery = DB::table('users')->limit($page);
-        if($page >= 0) {
-            $usersQuery->offset($start*$page);
-        }
+        $usersQuery = DB::table('users')->where('id', '>', 0);
 
         if(!empty($username)) {
             $usersQuery->where(function($query) use ($username){
@@ -64,12 +61,17 @@ class HomeController extends Controller
             }
         }
         $usersQuery->orderBy($column, $orderDir);
+        $totalRecordsFiltered = $usersQuery->get()->count();
+        if($start > 0) {
+            $offset = ($start/$page);
+            $usersQuery->offset($offset*$page);
+        }
+        $usersQuery->limit($page);
         $users = $usersQuery->get()->toArray();
-        $total = DB::table('users')->get()->count();
         return response()->json([
             'data' => $users,
-            'recordsTotal'=> $total,
-            'recordsFiltered' => \count($users)
+            'recordsTotal'=> $totalRecordsFiltered,
+            'recordsFiltered' => $totalRecordsFiltered
         ]);
     }
 
@@ -98,21 +100,28 @@ class HomeController extends Controller
         $userId = $request->get('userId');
         $start = $request->get('start');
         $page = $request->get('length');
+        $orderElement = $request->get('order')[0];
+        $orderDir = $orderElement['dir'];
+        $column = $request->get('columns')[$orderElement['column']]['data'];
         $giftCardsQuery = GiftCard::with(['getOwner']);
         if(!empty($userId) && $userId !==0 ){
             $giftCardsQuery->where('owner', $userId);
         }
+        $totalRecordsFiltered = $giftCardsQuery->get()->count();
 
-        if($page >= 0) {
-            $giftCardsQuery->offset($start*$page);
+        if($start > 0) {
+            $offset = ($start/$page);
+            $giftCardsQuery->offset($offset*$page);
         }
+
+
+        $giftCardsQuery->orderBy($column, $orderDir);
         $giftCardsQuery->limit($page);
         $giftcards = $giftCardsQuery->get()->toArray();
-        $totalGiftCardsForUser = DB::table('gift_card')->where('owner', $userId)->get()->count();
         return response()->json([
             'data' => $giftcards,
-            'recordsTotal'=> $totalGiftCardsForUser,
-            'recordsFiltered' => \count($giftcards)
+            'recordsTotal'=> $totalRecordsFiltered,
+            'recordsFiltered' => $totalRecordsFiltered
         ]);
     }
 
@@ -122,7 +131,7 @@ class HomeController extends Controller
         $user = $request->get('userId');
 
         $giftCardItem = DB::table('gift_card')->where('id', $giftcard)
-                ->where('owner', $user)->get();
+                ->where('owner', $user)->first();
 
         if(!$giftCardItem) {
             return response()->json([
@@ -138,7 +147,7 @@ class HomeController extends Controller
         if($affectedRows > 0) {
             return response()->json([
                 'code' => 200,
-                'message' => 'Gift Card was activated sucessfully.'
+                'message' => 'Gift Card was activated successfully.'
             ]);
         }
 
@@ -153,9 +162,18 @@ class HomeController extends Controller
         $title = $request->get('title');
         $body = $request->get('body');
         $ids = $request->get('users');
+        $errors = false;
         foreach ($ids as $id) {
             $user = User::find($id);
-            (new CloudMessages())->sendMessage($title, $body, $user);
+            $response = (new CloudMessages())->sendMessage($title, $body, $user);
+            if (!$response) {
+                $errors = true;
+            }
         }
+
+        return response()->json([
+            'code' => 200,
+            'errors' => $errors
+        ]);
     }
 }
