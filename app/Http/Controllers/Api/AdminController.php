@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Mail\BuildMail;
 use App\Promotion;
 use App\Recargas;
 use App\GiftCard;
@@ -12,6 +13,9 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use DateTime;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Messaging\Notification;
 
@@ -103,6 +107,7 @@ class AdminController extends Controller
         $user = User::find($request->user()->id);
         $user->points += $request->points;
         $user->save();
+        Log::info($user->email. ' earned '.  $request->points);
         return response()->json($user);
     }
 
@@ -177,6 +182,7 @@ class AdminController extends Controller
             $user = User::where('id', $request->userId)->first();
             $user->points += $request->coinAmount;
             $user->save();
+            Log::info($user->email. ' earned '.  $request->coinAmount. 'points from AdJoe');
             return response()->json(null, 200);
         } else {
             return response()->json(null, 403);
@@ -210,9 +216,41 @@ class AdminController extends Controller
         $messaging->send($message);
     }
 
-    public function getUsers(Request $request)
+    public function sendVerificationCode(Request $request)
     {
-        dd('aqui estoy llegando');
+        $user = User::find($request->user()->id);
+        $characters = '0123456789';
+        $charactersNumber = strlen($characters);
+        $codeLength = 6;
+        $code = "";
+        while (strlen($code) < 6) {
+            $position = rand(0, $charactersNumber - 1);
+            $character = $characters[$position];
+            $code = $code.$character;
+        }
+        $user->email_verification_code = $code;
+        $user->save();
+        Mail::to($user->email)->send(new BuildMail($user));
+
+        return response()->json(null, 200);
     }
+
+
+    public function verifyEmail(Request $request)
+    {
+        $user = User::find($request->user()->id);
+
+        if($request->code == $user->email_verification_code){
+            $user->email_verified_at = Carbon::now();
+            $user->save();
+            return response()->json([
+                'message' => "Your email was verified successful."], 200);
+        } else{
+            return response()->json([
+                'message' => "Wrong Code "], 403);
+        }
+
+    }
+
 
 }
