@@ -16,11 +16,8 @@ class CloudMessages
 
         if (!empty($user->fcm_token)) {
             $message = CloudMessage::withTarget('token', $user->fcm_token)
-                ->withNotification(Notification::create($title, $body));
-
-            if(\count($data) > 0) {
-                $message->withData($data);
-            }
+                ->withNotification(Notification::create($title, $body))
+                ->withData($data);
 
             try {
                 $result = $messaging->send($message);
