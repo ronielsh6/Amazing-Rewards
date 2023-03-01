@@ -10,7 +10,7 @@ use Kreait\Firebase\Messaging\Notification;
 
 class CloudMessages
 {
-    public function sendMessage(string $title, string $body, User $user, array $data = []) : bool
+    public function sendMessage(string $title, string $body, User $user, array $data = [], $logs = false) : bool
     {
         $messaging = app('firebase.messaging');
 
@@ -22,7 +22,9 @@ class CloudMessages
             try {
                 $result = $messaging->send($message);
             }catch (FirebaseException $exception) {
-                Log::info($exception->getMessage() . ' Exception generated for user '. $user->email);
+                if ($logs) {
+                    Log::info($exception->getMessage() . ' Exception generated for user ' . $user->email);
+                }
                 return false;
             }
 
@@ -31,7 +33,9 @@ class CloudMessages
             }
         }
 
-        Log::info('User '.$user->email.' has not FCM token.');
+        if ($logs) {
+            Log::info('User ' . $user->email . ' has not FCM token.');
+        }
 
         return false;
     }
