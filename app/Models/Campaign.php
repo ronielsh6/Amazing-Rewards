@@ -31,7 +31,7 @@ class Campaign extends Model
      * @var array
      */
     protected $fillable = [
-        'start_date', 'end_date', 'execution_time', 'frequency', 'parameters', 'title', 'body'
+        'start_date', 'end_date', 'execution_time', 'frequency', 'parameters', 'title', 'body', 'deep_link'
     ];
 
     public function executions(): HasMany
