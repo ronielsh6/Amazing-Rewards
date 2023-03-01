@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ProcessCampaign;
 use App\Models\Campaign;
 use App\Models\Execution;
 use App\Models\User;
@@ -109,27 +110,8 @@ class CampaignController extends Controller
         $errors = false;
         $startTime = date("h:i:s");
         foreach ($users as $user) {
-            $result = (new CloudMessages())->sendMessage($campaign->title, $campaign->body, $user, ['deep_link' => $campaign->deep_link]);
-            if (!$result) {
-                $errors = true;
-            }
+            ProcessCampaign::dispatch(new CloudMessages(), $user, $campaign);
         }
-        if ($errors) {
-            return response()->json([
-                'code' => 400,
-                'message' => 'Error updating campaign'
-            ]);
-        }
-
-        $endTime = date("h:i:s");
-        $execution = new Execution([
-            'date' => $dateTime->format('Y-m-d'),
-            'start_at' => $startTime,
-            'end_at' => $endTime,
-            'errors' => $errors ? 'There where errors in this execution. Check the logs.' : '[]',
-            'parameters' => (string)$campaign->parameters,
-        ]);
-        $campaign->executions()->save($execution);
         return response()->json([
             'code' => 200,
             'message' => 'Campaign executed successfully'

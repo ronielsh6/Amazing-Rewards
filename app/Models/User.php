@@ -54,4 +54,14 @@ class User extends Authenticatable
     {
         return $this->attributes['admin'] === 1;
     }
+
+    /**
+     * Run the database seeders.
+     */
+    public function run(): void
+    {
+        User::factory()
+            ->count(50)
+            ->create();
+    }
 }
