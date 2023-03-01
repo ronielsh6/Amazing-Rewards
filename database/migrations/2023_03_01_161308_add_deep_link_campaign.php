@@ -13,9 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->boolean('lock_screen')->default(false);
-            $table->string('app_version');
+        Schema::table('campaigns', function (Blueprint $table) {
+            $table->string('deep_link');
         });
     }
 
@@ -26,9 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('lock_screen');
-            $table->dropColumn('app_version');
+        Schema::table('campaigns', function (Blueprint $table) {
+            $table->dropColumn('deep_link');
         });
     }
 };

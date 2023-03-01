@@ -10,14 +10,17 @@ use Kreait\Firebase\Messaging\Notification;
 
 class CloudMessages
 {
-    public function sendMessage(string $title, string $body, User $user) : bool
+    public function sendMessage(string $title, string $body, User $user, array $data = []) : bool
     {
         $messaging = app('firebase.messaging');
 
         if (!empty($user->fcm_token)) {
             $message = CloudMessage::withTarget('token', $user->fcm_token)
-                ->withNotification(Notification::create($title, $body))
-                ->withData(['key' => 'value']);
+                ->withNotification(Notification::create($title, $body));
+
+            if(\count($data) > 0) {
+                $message->withData($data);
+            }
 
             try {
                 $result = $messaging->send($message);
