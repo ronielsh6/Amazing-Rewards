@@ -2,7 +2,7 @@ let CampaignsTable = function() {
     let dataUri = '';
 
     let setUri = function(dataUri) {
-        this.dataUri =dataUri;
+        this.dataUri = dataUri;
     };
 
     let declare = function(){
@@ -27,7 +27,7 @@ let CampaignsTable = function() {
             },
             columnDefs: [
                 {"className": "dt-center", "targets": "_all"},
-                { 'orderable': false, targets: [6] }
+                { 'orderable': false, targets: [6, 7, 8] }
             ],
             columns: [
                 {data: 'title'},
@@ -110,7 +110,41 @@ let CampaignsTable = function() {
                 $(method).val('PUT');
                 edit(data);
             }
+            if(jQuery.inArray('btn-success', $class) !== -1){
+                execute({
+                    _token: getCsrfToken(),
+                    id: data['id']
+                });
+            }
         });
+
+        let execute = function (data) {
+            $.post(executeUri, data, function (response) {
+                if (response['code'] === 200) {
+                    $.toast({
+                        heading: 'Notification',
+                        text: response['message'],
+                        showHideTransition: 'slide',
+                        icon: 'success',
+                        position: 'bottom-right',
+                        stack: true,
+                        hideAfter: 10000
+                    });
+                    $('#campaignFormModal').modal('hide');
+                    datatable.ajax.reload();
+                } else {
+                    $.toast({
+                        heading: 'Notification',
+                        text: response['message'],
+                        showHideTransition: 'slide',
+                        icon: 'danger',
+                        position: 'bottom-right',
+                        stack: true,
+                        hideAfter: 10000
+                    });
+                }
+            });
+        }
 
         let edit = function (data) {
 
@@ -119,6 +153,7 @@ let CampaignsTable = function() {
             $('#start_date').val(moment(data['start_date']).format('MM/DD/YYYY'));
             $('#end_date').val(moment(data['end_date']).format('MM/DD/YYYY'));
             $('#frequency').val(data['frequency']);
+            $('#deep_link').val(data['deep_link']);
             $('#title').val(data['title']);
             $('#body').val(data['body']);
             $('#campaignFormModal').modal('show');
@@ -160,6 +195,7 @@ let CampaignsTable = function() {
                 start_date: moment($('#start_date').val()).format('YYYY-MM-DD'),
                 end_date: moment($('#end_date').val()).format('YYYY-MM-DD'),
                 frequency: $('#frequency').val(),
+                deep_link: $('#deep_link').val(),
                 title: $('#title').val(),
                 body: $('#body').val(),
                 parameters: $parameters.sql
@@ -186,6 +222,9 @@ let CampaignsTable = function() {
 
         $('.select2').select2({
             width: '20vw'
+        });
+        $('.frequency').select2({
+            width: '12vw'
         });
     }
 

@@ -14,8 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('campaigns', function (Blueprint $table) {
-            $table->string('title');
-            $table->string('body');
+            $table->string('deep_link');
         });
     }
 
@@ -27,8 +26,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('campaigns', function (Blueprint $table) {
-            $table->dropColumn('title');
-            $table->dropColumn('body');
+            $table->dropColumn('deep_link');
         });
     }
 };

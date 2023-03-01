@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Campaign;
+use App\Models\Execution;
+use App\Models\User;
+use App\Services\CloudMessages;
 use Illuminate\Http\Request;
 
 class CampaignController extends Controller
@@ -38,8 +41,9 @@ class CampaignController extends Controller
             $campaignsQuery->offset($offset * $page);
         }
 
-
-        $campaignsQuery->orderBy($column, $orderDir);
+        if ($column !== 'executions') {
+            $campaignsQuery->orderBy($column, $orderDir);
+        }
         $campaignsQuery->limit($page);
         $campaigns = $campaignsQuery->get()->toArray();
         return response()->json([
@@ -89,5 +93,46 @@ class CampaignController extends Controller
     public function deleteCampaign(Request $request)
     {
 
+    }
+
+    public function executeCampaign(Request $request)
+    {
+        $id = $request->get('id');
+        $campaign = Campaign::find($id);
+
+        $users = User::with('getGiftCards')
+            ->whereRaw($campaign->parameters)
+            ->get();
+
+        $dateTime = new \DateTime('now');
+
+        $errors = false;
+        $startTime = date("h:i:s");
+        foreach ($users as $user) {
+            $result = (new CloudMessages())->sendMessage($campaign->title, $campaign->body, $user, ['deep_link' => $campaign->deep_link]);
+            if (!$result) {
+                $errors = true;
+            }
+        }
+        if ($errors) {
+            return response()->json([
+                'code' => 400,
+                'message' => 'Error updating campaign'
+            ]);
+        }
+
+        $endTime = date("h:i:s");
+        $execution = new Execution([
+            'date' => $dateTime->format('Y-m-d'),
+            'start_at' => $startTime,
+            'end_at' => $endTime,
+            'errors' => $errors ? 'There where errors in this execution. Check the logs.' : '[]',
+            'parameters' => (string)$campaign->parameters,
+        ]);
+        $campaign->executions()->save($execution);
+        return response()->json([
+            'code' => 200,
+            'message' => 'Campaign executed successfully'
+        ]);
     }
 }

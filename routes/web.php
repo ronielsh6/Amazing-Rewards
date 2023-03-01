@@ -40,3 +40,4 @@ Route::post('/campaigns/list', [App\Http\Controllers\CampaignController::class, 
 Route::post('/campaigns/create', [App\Http\Controllers\CampaignController::class, 'createCampaign'])->name('createCampaign');
 Route::post('/campaigns/update', [App\Http\Controllers\CampaignController::class, 'updateCampaign'])->name('updateCampaign');
 Route::post('/campaigns/delete', [App\Http\Controllers\CampaignController::class, 'deleteCampaign'])->name('deleteCampaign');
+Route::post('/campaigns/execute', [App\Http\Controllers\CampaignController::class, 'executeCampaign'])->name('executeCampaign');
