@@ -6,7 +6,7 @@
         <img src="{{ asset('assets/img/app_icon.png') }}" class="navbar-brand-img h-100" alt="main_logo">
         <span class="ms-1 font-weight-bold text-white">Amazing Rewards</span>
       </a>
-    </div>     
+    </div>
     <hr class="horizontal light mt-0 mb-2">
     <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
       <ul class="navbar-nav">
@@ -33,6 +33,14 @@
         </div>
       <span class="nav-link-text ms-1">Gift Cards</span>
     </a>
+  </li>
+  <li class="nav-item">
+      <a class="nav-link text-white @if(Route::is('campaigns')) active @endif" href="{{ route('campaigns') }}">
+          <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">schedule</i>
+          </div>
+          <span class="nav-link-text ms-1">Campaigns</span>
+      </a>
   </li>
   {{-- <li class="nav-item">
     <a class="nav-link text-white " href="./virtual-reality.html">

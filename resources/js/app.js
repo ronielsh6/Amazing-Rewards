@@ -1,4 +1,4 @@
 import './bootstrap';
-import 'jquery-toast-plugin';
+import 'jquery'
+import 'jquery-toast-plugin'
 import swal from 'sweetalert';
-
