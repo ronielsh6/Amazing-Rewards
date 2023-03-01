@@ -15,11 +15,11 @@ class CampaignJobs
         $campaigns = Campaign::all();
         foreach ($campaigns as $campaign) {
             $dateTime = new \DateTime('now');
-            $time = date("h:i:s");
+            $time = date("h:i");
             $startDate = new \DateTime($campaign->start_date);
             $endDate = new \DateTime($campaign->end_date);
             $executionTime = new \DateTime($campaign->execution_time);
-            if (($startDate <= $dateTime) && ($endDate >= $dateTime) && $time === $executionTime->format('h:i:s')) {
+            if (($startDate <= $dateTime) && ($endDate >= $dateTime) && $time === $executionTime->format('h:i')) {
                 $startTime = date("h:i:s");
                 $query = User::with('getGiftCards');
                 $query->whereRaw($campaign->parameters);
