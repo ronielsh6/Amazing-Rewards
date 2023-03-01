@@ -39,4 +39,5 @@ Route::group(['middleware' => 'auth:api', 'namespace'], function() {
     Route::post('user/updateFcmToken', 'App\Http\Controllers\Api\AdminController@updateFcmToken');
     Route::post('user/requestEmailCode', 'App\Http\Controllers\Api\AdminController@sendVerificationCode');
     Route::post('user/verifyEmail', 'App\Http\Controllers\Api\AdminController@verifyEmail');
+    Route::post('user/updateLockScreenPermission', 'App\Http\Controllers\Api\AdminController@updateLockScreenPermission');
 });
