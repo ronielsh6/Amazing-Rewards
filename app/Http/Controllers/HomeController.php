@@ -45,8 +45,7 @@ class HomeController extends Controller
 
         if(!empty($username)) {
             $usersQuery->where(function($query) use ($username){
-                $query->where('name', 'like', '%'. $username .'%')
-                ->orWhere('email', 'like', '%'. $username .'%');
+                $query->where('email', 'like', '%'. $username .'%');
             });
         }
 
@@ -161,11 +160,12 @@ class HomeController extends Controller
     {
         $title = $request->get('title');
         $body = $request->get('body');
+        $deepLink = $request->get('deepLink');
         $ids = $request->get('users');
         $errors = false;
         foreach ($ids as $id) {
             $user = User::find($id);
-            $response = (new CloudMessages())->sendMessage($title, $body, $user);
+            $response = (new CloudMessages())->sendMessage($title, $body, $user, ['deep_link' => $deepLink]);
             if (!$response) {
                 $errors = true;
             }

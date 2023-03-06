@@ -1,5 +1,6 @@
 let CampaignsTable = function() {
     let dataUri = '';
+    let creation = true;
 
     let setUri = function(dataUri) {
         this.dataUri = dataUri;
@@ -33,10 +34,10 @@ let CampaignsTable = function() {
                 {data: 'title'},
                 {data: 'body'},
                 { data: 'start_date', render: function(data, type) {
-                    return moment(data).format('DD/MM/YYYY');
+                    return moment(data).format('MM/DD/YYYY');
                 } },
                 { data: 'end_date', render: function(data, type) {
-                        return moment(data).format('DD/MM/YYYY');
+                        return moment(data).format('MM/DD/YYYY');
                 } },
                 { data: 'execution_time'},
                 { data: 'frequency' , render: function(data, type) {
@@ -46,7 +47,7 @@ let CampaignsTable = function() {
                 { data: 'executions', render: function (data, type) {
                     let length = data.length;
                     if (length > 0) {
-                        return moment(data[length - 1].date).format('DD/MM/YYYY');
+                        return moment(data[length - 1].date).format('MM/DD/YYYY');
                     }
                     return 'No executions yet';
                 } },
@@ -76,10 +77,15 @@ let CampaignsTable = function() {
                 id: 'users.app_version',
                 label: 'User app version',
                 type: 'double'
+            },{
+                id: 'users.points',
+                label: 'User points',
+                type: 'integer'
             }
         ];
 
-        $('#builder').queryBuilder({
+        let builder = $('#builder');
+        builder.queryBuilder({
             filters: queryBuilderFilters
         });
 
@@ -105,6 +111,7 @@ let CampaignsTable = function() {
             var data = datatable.row( $(this).parents('tr') ).data();
             let $class = this.classList;
             if(jQuery.inArray('btn-warning', $class) !== -1){
+                creation = false;
                 $('#campaign_id').val(data['id']);
                 let method = $('#campaignFormModal').find('input#method');
                 $(method).val('PUT');
@@ -142,13 +149,29 @@ let CampaignsTable = function() {
                         stack: true,
                         hideAfter: 10000
                     });
+                    $('#campaignFormModal').modal('hide');
+                    datatable.ajax.reload();
                 }
             });
         }
 
-        let edit = function (data) {
+        $("#campaignFormModal").on('hide.bs.modal', function(){
+            cleanForm();
+        });
 
-            $('#builder').queryBuilder('setRulesFromSQL', data['parameters']);
+        let cleanForm = function() {
+            $.datepicker._clearDate($('#start_date'));
+            $.datepicker._clearDate($('#end_date'));
+            builder.queryBuilder('reset');
+            $('#title').val('');
+            $('#body').val('');
+            $('#execution_time').val('');
+            $('#impact-indicator').html('- users');
+        }
+
+        let edit = function (data) {
+            builder.queryBuilder('setRulesFromSQL', data['parameters']);
+            process();
             $('#execution_time').val(data['execution_time']);
             $('#start_date').val(moment(data['start_date']).format('MM/DD/YYYY'));
             $('#end_date').val(moment(data['end_date']).format('MM/DD/YYYY'));
@@ -171,6 +194,7 @@ let CampaignsTable = function() {
                     hideAfter: 10000
                 });
                 $('#campaignFormModal').modal('hide');
+                cleanForm();
                 datatable.ajax.reload();
             } else {
                 $.toast({
@@ -185,9 +209,30 @@ let CampaignsTable = function() {
             }
         }
 
-        $('.submit-campaign').on('click', function () {
+        builder.on('rulesChanged.queryBuilder', function(e, rule) {
+            if (creation) {
+                process();
+            }
+        });
 
-            let $parameters = $('#builder').queryBuilder('getSQL', $(this).data('stmt'), false);
+        let process = function() {
+            let valid = builder.queryBuilder('validate');
+            if(valid) {
+                let data = {
+                    _token: getCsrfToken(),
+                    query: builder.queryBuilder('getSQL', $(this).data('stmt'), false)['sql']
+                }
+
+                $.post(queryImpact, data, function (response) {
+                    if (response['code'] === 200) {
+                        $('#impact-indicator').html(response['total'] + ' users');
+                    }
+                });
+            }
+        }
+
+        $('.submit-campaign').on('click', function () {
+            let $parameters = builder.queryBuilder('getSQL', $(this).data('stmt'), false);
             let data = {
                 _token: getCsrfToken(),
                 campaign_id: $('#campaign_id').val(),
@@ -210,11 +255,11 @@ let CampaignsTable = function() {
                     sendCallback(response);
                 });
             }
-
         });
 
         $('#createCampaign').on('click', function () {
             $('#campaign_id').val(0);
+            creation = true;
             let method = $('#campaignFormModal').find('input#method');
             $(method).val('POST');
             $('#campaignFormModal').modal('show');

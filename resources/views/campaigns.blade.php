@@ -85,6 +85,7 @@
     <script src="{{ asset('assets/js/campaignsTable.js') }}"></script>
     <script>
         let executeUri = '{{ route('executeCampaign') }}';
+        let queryImpact = '{{ route('queryImpact') }}'
         CampaignsTable.setUri('{{ route('campaignsList') }}');
 
         CampaignsTable.init();
