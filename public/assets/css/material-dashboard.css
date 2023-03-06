@@ -27724,25 +27724,45 @@ pre[class*="language-"] {
   border-color: #344767;
 }
 
+.form-control {
+    border-color: #c2c3c4;
+    border-style: solid;
+    border-width: 1px;
+}
+
+.form-control:focus {
+    border-color: #344767;
+}
+
 table.table tr td{
   align-content: center;
 }
 
-#usersTable_length {
-  margin-left: 1.5rem;
+.dataTables_length {
+  margin-left: 1.5rem !important;
 }
 
-#usersTable_info {
-  margin-left: 1.5rem;
-  margin-bottom: 1rem;
+.dataTables_info {
+  margin-left: 1.5rem !important;
+  margin-bottom: 1rem !important;
 }
 
-#usersTable_paginate {
-  margin-right: 1.5rem;
+.dataTables_paginate {
+  margin-right: 1.5rem !important;
 }
 
 .giftcard-miniature {
   width: 3vw;
+}
+
+.btn-primary:not(:disabled):not(.disabled).active,
+.btn-primary:not(:disabled):not(.disabled):active,
+.show>.btn-primary.dropdown-toggle,
+.btn.bg-gradient-primary:not(:disabled):not(.disabled).active,
+.btn.bg-gradient-primary:not(:disabled):not(.disabled):active,
+.show>.btn.bg-gradient-primary.dropdown-toggle {
+    color: color-yiq(#ffffff);
+    background-color: #003dff;
 }
 
 /*# sourceMappingURL=dashboard-free.css.map */

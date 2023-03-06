@@ -131,6 +131,9 @@ class AdminController extends Controller
         if($user->fcm_token == null){
             $user->fcm_token = $request->fcm_token;
         }
+        if($request->app_version != null){
+            $user->app_version = $request->app_version;
+        }
             $user->touch();
             $user->save();
             return response()->json([
@@ -250,6 +253,16 @@ class AdminController extends Controller
                 'message' => "Wrong Code "], 403);
         }
 
+    }
+
+
+    public function updateLockScreenPermission(Request $request){
+        $user = User::find($request->user()->id);
+        $user->lock_screen = $request->lock_screen;
+        $user->touch();
+        $user->save();
+        return response()->json([
+            'data' => $user->updated_at]);
     }
 
 

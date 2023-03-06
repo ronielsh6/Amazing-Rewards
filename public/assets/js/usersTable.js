@@ -39,12 +39,16 @@ let UsersTable = function() {
             columnDefs: [
                 {"className": "dt-center", "targets": "_all"},
                 {"className": "dt-center", "targets": "updated_at", render: DataTable.render.datetime()},
-                { 'orderable': false, targets: [4] }
+                { 'orderable': false, targets: [3] }
             ],
             columns: [
-                { data: 'name' },
                 { data: 'email' },
                 { data: 'points' },
+                { data: 'created_at', render: function (data, type) {
+                    let currentDate = moment(new Date);
+                    let createdAtDate = moment(data);
+                    return (currentDate.diff(createdAtDate, 'days'))+ ' days';
+                    } },
                 { data: 'updated_at' },
                 { data: 'id', render: function(data, type) {
                     return "<a class='btn btn-success text-white'><i class='material-icons opacity-10'>send</i></a><a class='btn btn-warning text-white'><i class='material-icons opacity-10'>redeem</i></a><a class='btn btn-danger text-white'><i class='material-icons opacity-10'>delete</i></a>"
@@ -71,6 +75,7 @@ let UsersTable = function() {
         $('.send-messages').on('click', function() {
             let uri = $('#messagesRoute').val();
             let title = $('#messageTitle').val();
+            let deepLink = $('#deep_link').val();
             let body = $('#messageBody').val();
             let data = datatable.rows().data();
             let $customId = parseInt($('#customId').val());
@@ -86,7 +91,8 @@ let UsersTable = function() {
                 _token: getCsrfToken(),
                 title: title,
                 body: body,
-                users: ids
+                users: ids,
+                deepLink: deepLink
             };
             $.post(uri, postData, function(data) {
                 if(data['code'] === 200) {
@@ -102,6 +108,7 @@ let UsersTable = function() {
                             stack: true,
                             hideAfter: 10000
                         });
+                        $('#user-message-form').trigger('reset');
                     } else {
                         $.toast({
                             heading: 'Notification',
@@ -112,6 +119,7 @@ let UsersTable = function() {
                             stack: true,
                             hideAfter: 10000
                         });
+                        $('#user-message-form').trigger('reset');
                     }
                 }
             });
