@@ -1,13 +1,13 @@
-let CampaignsTable = function() {
+let CampaignsTable = function () {
     let dataUri = '';
     let creation = true;
 
-    let setUri = function(dataUri) {
+    let setUri = function (dataUri) {
         this.dataUri = dataUri;
     };
 
-    let declare = function(){
-        let datatable =$('#campaignsTable').DataTable({
+    let declare = function () {
+        let datatable = $('#campaignsTable').DataTable({
             language: {
                 processing: "Loading data ...",
                 emptyTable: "There are no records to show",
@@ -16,44 +16,66 @@ let CampaignsTable = function() {
                     next: ">",
                     first: "<<",
                     last: ">>"
-                  }
+                }
             },
             ajax: {
                 method: 'POST',
                 url: this.dataUri,
-                data: function(d){
+                data: function (d) {
                     d._token = getCsrfToken();
                 }
 
             },
             columnDefs: [
                 {"className": "dt-center", "targets": "_all"},
-                { 'orderable': false, targets: [6, 7, 8] }
+                {'orderable': false, targets: [6, 7, 8]}
             ],
             columns: [
                 {data: 'title'},
-                {data: 'body'},
-                { data: 'start_date', render: function(data, type) {
-                    return moment(data).format('MM/DD/YYYY');
-                } },
-                { data: 'end_date', render: function(data, type) {
-                        return moment(data).format('MM/DD/YYYY');
-                } },
-                { data: 'execution_time'},
-                { data: 'frequency' , render: function(data, type) {
-                    return data.charAt(0).toUpperCase() + data.slice(1);
-                } },
-                { data: 'parameters' },
-                { data: 'executions', render: function (data, type) {
-                    let length = data.length;
-                    if (length > 0) {
-                        return moment(data[length - 1].date).format('MM/DD/YYYY');
+                {
+                    data: 'body', render: function (data, type) {
+                        if (data.length > 22) {
+                            return data.substring(0, 22) + '...';
+                        }
+                        return data;
                     }
-                    return 'No executions yet';
-                } },
-                { data: 'id', render: function (data, type) {
-                    return '<a class="btn btn-warning text-white edit-campaign"><i class="material-icons opacity-10">edit</i></a><a class="btn btn-success text-white execute-on-demand"><i class="material-icons opacity-10">schedule</i></a>'
-                } }
+                },
+                {
+                    data: 'start_date', render: function (data, type) {
+                        return moment(data).format('MM/DD/YYYY');
+                    }
+                },
+                {
+                    data: 'end_date', render: function (data, type) {
+                        return moment(data).format('MM/DD/YYYY');
+                    }
+                },
+                {data: 'execution_time'},
+                {
+                    data: 'frequency', render: function (data, type) {
+                        return data.charAt(0).toUpperCase() + data.slice(1);
+                    }
+                },
+                {data: 'parameters', render: function (data, type) {
+                    if (data.length > 22) {
+                        return data.substring(0, 22) + '...';
+                    }
+                    return data;
+                    }},
+                {
+                    data: 'executions', render: function (data, type) {
+                        let length = data.length;
+                        if (length > 0) {
+                            return moment(data[length - 1].date).format('MM/DD/YYYY');
+                        }
+                        return 'No executions yet';
+                    }
+                },
+                {
+                    data: 'id', render: function (data, type) {
+                        return '<a class="btn btn-warning text-white edit-campaign"><i class="material-icons opacity-10">edit</i></a><a class="btn btn-success text-white execute-on-demand"><i class="material-icons opacity-10">schedule</i></a>'
+                    }
+                }
             ],
             filter: false,
             paging: true,
@@ -73,11 +95,11 @@ let CampaignsTable = function() {
                 default_value: 'true',
                 input: 'radio',
                 values: ['true', 'false']
-            },{
+            }, {
                 id: 'users.app_version',
                 label: 'User app version',
                 type: 'double'
-            },{
+            }, {
                 id: 'users.points',
                 label: 'User points',
                 type: 'integer'
@@ -107,17 +129,17 @@ let CampaignsTable = function() {
             timeFormat: 'HH:mm'
         });
 
-        $('#campaignsTable tbody').on('click', 'a', function() {
-            var data = datatable.row( $(this).parents('tr') ).data();
+        $('#campaignsTable tbody').on('click', 'a', function () {
+            var data = datatable.row($(this).parents('tr')).data();
             let $class = this.classList;
-            if(jQuery.inArray('btn-warning', $class) !== -1){
+            if (jQuery.inArray('btn-warning', $class) !== -1) {
                 creation = false;
                 $('#campaign_id').val(data['id']);
                 let method = $('#campaignFormModal').find('input#method');
                 $(method).val('PUT');
                 edit(data);
             }
-            if(jQuery.inArray('btn-success', $class) !== -1){
+            if (jQuery.inArray('btn-success', $class) !== -1) {
                 execute({
                     _token: getCsrfToken(),
                     id: data['id']
@@ -155,11 +177,11 @@ let CampaignsTable = function() {
             });
         }
 
-        $("#campaignFormModal").on('hide.bs.modal', function(){
+        $("#campaignFormModal").on('hide.bs.modal', function () {
             cleanForm();
         });
 
-        let cleanForm = function() {
+        let cleanForm = function () {
             $.datepicker._clearDate($('#start_date'));
             $.datepicker._clearDate($('#end_date'));
             builder.queryBuilder('reset');
@@ -209,15 +231,15 @@ let CampaignsTable = function() {
             }
         }
 
-        builder.on('rulesChanged.queryBuilder', function(e, rule) {
+        builder.on('rulesChanged.queryBuilder', function (e, rule) {
             if (creation) {
                 process();
             }
         });
 
-        let process = function() {
+        let process = function () {
             let valid = builder.queryBuilder('validate');
-            if(valid) {
+            if (valid) {
                 let data = {
                     _token: getCsrfToken(),
                     query: builder.queryBuilder('getSQL', $(this).data('stmt'), false)['sql']
@@ -250,7 +272,7 @@ let CampaignsTable = function() {
                 $.post($('#createUri').val(), data, function (response) {
                     sendCallback(response);
                 });
-            }else {
+            } else {
                 $.post($('#updateUri').val(), data, function (response) {
                     sendCallback(response);
                 });
@@ -274,10 +296,10 @@ let CampaignsTable = function() {
     }
 
     return {
-        init: function() {
+        init: function () {
             declare();
         },
-        setUri: function(dataUri) {
+        setUri: function (dataUri) {
             setUri(dataUri);
         }
     }
