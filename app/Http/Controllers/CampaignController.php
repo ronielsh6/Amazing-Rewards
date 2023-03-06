@@ -117,4 +117,16 @@ class CampaignController extends Controller
             'message' => 'Campaign executed successfully'
         ]);
     }
+
+    public function queryImpact(Request $request) {
+        $query = $request->get('query');
+        $users = User::with('getGiftCards')
+            ->whereRaw($query)
+            ->get()->count();
+
+        return response()->json([
+            'code' => 200,
+            'total' => $users
+        ]);
+    }
 }

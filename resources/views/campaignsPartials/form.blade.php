@@ -6,6 +6,9 @@
     <div class="col-12">
         <div id="builder"></div>
     </div>
+    <div class="col-12">
+        <span class="text-danger">Campaign will impact on </span><span id="impact-indicator" class="text-danger"> - users</span>
+    </div>
     <div class="col-6">
         <div class="form-group">
             <label for="execution_time">Execution time</label>

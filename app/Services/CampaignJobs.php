@@ -26,7 +26,7 @@ class CampaignJobs
                 $models = $query->get();
                 $errors = false;
                 foreach ($models as $model) {
-                    $result = (new CloudMessages())->sendMessage($campaign->title, $campaign->body, $model, ['deep_link' => $campaign->deep_link]);
+                    $result = (new CloudMessages())->sendMessage($campaign->title, $campaign->body, $model, ['deep_link' => $campaign->deep_link], true);
                     if (!$result) {
                         $errors = true;
                     }

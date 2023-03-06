@@ -21,7 +21,7 @@
             <div class="row mr-5 ml-5">
                 <div class="row filters">
                     <div class="col-2">
-                        <input type="text" class="form-control form-custom text-center" id="usernameInput" placeholder="Username">
+                        <input type="text" class="form-control form-custom text-center" id="usernameInput" placeholder="Email">
                     </div>
                     <div class="row col-4">
                         <div class="col-4">
@@ -47,9 +47,9 @@
               <table class="table align-items-center mb-0" id="usersTable">
                 <thead>
                   <tr>
-                    <th>Name</th>
                     <th>Email</th>
                     <th>Points</th>
+                    <th>Age</th>
                     <th>Last connection at</th>
                     <th></th>
                   </tr>
