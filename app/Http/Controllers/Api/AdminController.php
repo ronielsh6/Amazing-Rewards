@@ -131,6 +131,9 @@ class AdminController extends Controller
         if($user->fcm_token == null){
             $user->fcm_token = $request->fcm_token;
         }
+        if($user->advertising_id == null){
+            $user->advertising_id = $request->advertising_id;
+        }
         if($request->app_version != null){
             $user->app_version = $request->app_version;
         }
