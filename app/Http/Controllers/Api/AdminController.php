@@ -40,44 +40,44 @@ class AdminController extends Controller
         return $response->json("value");
     }
 
-    public function generateEgifterCard(Request $request)
-    {
-        $request->validate([
-            'value' => 'required',
-            'email' => 'required',
-            'poNumber' => 'required',
-            'note' => 'required',
-        ]);
-        $name = $request->name;
-        if($name == null){
-           $name = $request->email;
-        }
-
-        $token = $this->getAuthToken();
-
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer '.$token
-        ])->post(env('EGITFTER_URL').'/v1/Orders',
-            ['lineItems' => [[
-                'productId' => 'AMAZON',
-                'quantity' => 1,
-                'value' => $request->value,
-                'digitalDeliveryAddress' => [
-                    'email' => $request->email
-                ],
-                'personalization' => [
-                    'fromName' => 'Amazing Rewards',
-                    'to' => $name
-                ]
-            ]],
-                'poNumber' => $request->poNumber,
-                'type' => 'Links',
-                'note' => $request->note
-            ]);
-
-
-        return $response->json();
-    }
+//    public function generateEgifterCard(Request $request)
+//    {
+//        $request->validate([
+//            'value' => 'required',
+//            'email' => 'required',
+//            'poNumber' => 'required',
+//            'note' => 'required',
+//        ]);
+//        $name = $request->name;
+//        if($name == null){
+//           $name = $request->email;
+//        }
+//
+//        $token = $this->getAuthToken();
+//
+//        $response = Http::withHeaders([
+//            'Authorization' => 'Bearer '.$token
+//        ])->post(env('EGITFTER_URL').'/v1/Orders',
+//            ['lineItems' => [[
+//                'productId' => 'AMAZON',
+//                'quantity' => 1,
+//                'value' => $request->value,
+//                'digitalDeliveryAddress' => [
+//                    'email' => $request->email
+//                ],
+//                'personalization' => [
+//                    'fromName' => 'Amazing Rewards',
+//                    'to' => $name
+//                ]
+//            ]],
+//                'poNumber' => $request->poNumber,
+//                'type' => 'Links',
+//                'note' => $request->note
+//            ]);
+//
+//
+//        return $response->json();
+//    }
 
     public function createGiftCard(Request $request)
     {
