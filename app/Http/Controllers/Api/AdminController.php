@@ -32,10 +32,10 @@ class AdminController extends Controller
     private function getAuthToken()
     {
         $response = Http::withHeaders([
-//            'AccessToken' => '03b9nsl27htc939st11nt0sh1r080rtfr930th6d9d02n16381cl1tt29rk89t2s',
-            'AccessToken' => 'b9wh1nc1br1nt9nc9r69k16br9t2d710l9t11v1981nt989l16nd2v0nd0nh9r0j',
+            'AccessToken' => env('EGITFTER_ACCESS_TOKEN'),
+//            'AccessToken' => 'b9wh1nc1br1nt9nc9r69k16br9t2d710l9t11v1981nt989l16nd2v0nd0nh9r0j', PROD
             'Email' => 'info@myamazingrewards.com'
-        ])->post('https://rewards-api.egifter.com/v1/Tokens');
+        ])->post(env('EGITFTER_URL').'/v1/Tokens');
 
         return $response->json("value");
     }
@@ -57,7 +57,7 @@ class AdminController extends Controller
 
         $response = Http::withHeaders([
             'Authorization' => 'Bearer '.$token
-        ])->post('https://rewards-api.egifter.com/v1/Orders',
+        ])->post(env('EGITFTER_URL').'/v1/Orders',
             ['lineItems' => [[
                 'productId' => 'AMAZON',
                 'quantity' => 1,
@@ -84,8 +84,6 @@ class AdminController extends Controller
         $request->validate([
             'amount' => 'required',
             'status' => 'required',
-            'claim_link' => 'required',
-            'egifter_id' => 'required',
         ]);
         $request['pending'] = true;
         $request['owner'] = $request->user()->id;

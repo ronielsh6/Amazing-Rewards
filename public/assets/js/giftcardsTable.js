@@ -58,7 +58,12 @@ let GiftCardsTable = function() {
                     return data.charAt(0).toUpperCase() + data.slice(1);
                 } },
                 { data: 'claim_link', render: function(data, type) {
-                    return '<a href="'+data+'" target="_blank">'+data.substring(0,25)+'</a>';
+                    if (data != null){
+                        return '<a href="'+data+'" target="_blank">'+data.substring(0,25)+'</a>';
+                    }else{
+                        return '<a href="'+data+'" target="_blank">PENDING</a>';
+                    }
+
                 } },
                 { data: 'egifter_id' },
                 { data: 'pending', render: function(data, type) {
@@ -104,6 +109,7 @@ let GiftCardsTable = function() {
                             userId: this.userId !== 0 ? this.userId :  data['get_owner']['id']
                         };
                         $.post(this.redeemUri, postData, function(data) {
+                            console.log(data);
                             if(data['code'] === 200) {
                                 $.toast({
                                     heading: 'Notification',

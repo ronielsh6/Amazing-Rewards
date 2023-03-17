@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Services\CloudMessages;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use function MongoDB\BSON\toJSON;
 
 class HomeController extends Controller
 {
@@ -124,13 +126,30 @@ class HomeController extends Controller
         ]);
     }
 
+
+    private function getAuthToken()
+    {
+        $response = Http::withHeaders([
+            'AccessToken' => env('EGITFTER_ACCESS_TOKEN'),
+//            'AccessToken' => 'b9wh1nc1br1nt9nc9r69k16br9t2d710l9t11v1981nt989l16nd2v0nd0nh9r0j', PROD
+            'Email' => 'info@myamazingrewards.com'
+        ])->post(env('EGITFTER_URL').'/v1/Tokens');
+
+        return $response->json("value");
+    }
+
+
     public function getEnabledGiftCard(Request $request)
     {
         $giftcard = $request->get('card');
         $user = $request->get('userId');
 
+        $userObj = DB::table('users')->where('id', $user)->first();
+
         $giftCardItem = DB::table('gift_card')->where('id', $giftcard)
                 ->where('owner', $user)->first();
+
+
 
         if(!$giftCardItem) {
             return response()->json([
@@ -138,6 +157,17 @@ class HomeController extends Controller
                 'message' => 'Data error'
             ]);
         }
+
+        $eGifterResponse = $this->generateEgifterCard($giftCardItem, $userObj);
+
+            $giftCard = GiftCard::find($giftcard);
+            $giftCard->claim_link = $eGifterResponse["lineItems"][0]["claimData"][0]["claimLink"];
+            $giftCard->challenge_code = $eGifterResponse["lineItems"][0]["claimData"][0]["claimLinkChallengeAnswer"];
+            $giftCard->egifter_id = $eGifterResponse["id"];
+            $giftCard->touch();
+            $giftCard->save();
+
+
 
         $affectedRows = DB::table('gift_card')->where('id', $giftcard)
                 ->where('owner', $user)
@@ -175,5 +205,34 @@ class HomeController extends Controller
             'code' => 200,
             'errors' => $errors
         ]);
+    }
+
+    private function generateEgifterCard( $card, $user)
+    {
+        $name = $user->name;
+        $token = $this->getAuthToken();
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer '.$token
+        ])->post(env('EGITFTER_URL').'/v1/Orders',
+            ['lineItems' => [[
+                'productId' => 'AMAZON',
+                'quantity' => 1,
+                'value' => $card->amount,
+                'digitalDeliveryAddress' => [
+                    'email' => $user->email
+                ],
+                'personalization' => [
+                    'fromName' => 'Amazing Rewards',
+                    'to' => $name
+                ]
+            ]],
+                'poNumber' => $user->email.''.$card->id,
+                'type' => 'Links',
+                'note' => $user->email
+            ]);
+
+
+        return $response->json();
     }
 }
