@@ -126,7 +126,7 @@ class AdminController extends Controller
 
     public function updateFcmToken(Request $request){
         $user = User::find($request->user()->id);
-        if($user->fcm_token == null){
+        if($user->fcm_token != $request->fcm_token){
             $user->fcm_token = $request->fcm_token;
         }
         if($user->advertising_id == null){
