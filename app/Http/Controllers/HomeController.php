@@ -218,7 +218,7 @@ class HomeController extends Controller
             $name = $user->email;
         }
         $token = $this->getAuthToken();
-        dd($token);
+
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $token
         ])->post(env('EGITFTER_URL') . '/v1/Orders',
