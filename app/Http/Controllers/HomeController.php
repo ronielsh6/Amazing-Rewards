@@ -239,7 +239,7 @@ class HomeController extends Controller
                 'note' => $user->email
             ]);
 
-
+        dd($response);
         return $response->json();
     }
 }
