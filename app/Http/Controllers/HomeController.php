@@ -134,7 +134,7 @@ class HomeController extends Controller
 //            'AccessToken' => 'b9wh1nc1br1nt9nc9r69k16br9t2d710l9t11v1981nt989l16nd2v0nd0nh9r0j', PROD
             'Email' => 'info@myamazingrewards.com'
         ])->post(env('EGITFTER_URL') . '/v1/Tokens');
-
+         dd($response->json());
         return $response->json("value");
     }
 
@@ -238,8 +238,6 @@ class HomeController extends Controller
                 'type' => 'Links',
                 'note' => $user->email
             ]);
-
-        dd($token);
         return $response->json();
     }
 }
