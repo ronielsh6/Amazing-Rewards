@@ -239,7 +239,7 @@ class HomeController extends Controller
                 'note' => $user->email
             ]);
 
-        dd(env('EGITFTER_URL'));
+        dd($token);
         return $response->json();
     }
 }
