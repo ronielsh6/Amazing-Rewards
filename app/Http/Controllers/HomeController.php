@@ -158,6 +158,7 @@ class HomeController extends Controller
         }
 
         $eGifterResponse = $this->generateEgifterCard($giftCardItem, $userObj);
+        dd($eGifterResponse);
 
         if (array_key_exists("previousOrderIds", $eGifterResponse)) {
             return response()->json([
