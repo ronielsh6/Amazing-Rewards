@@ -158,7 +158,6 @@ class HomeController extends Controller
         }
 
         $eGifterResponse = $this->generateEgifterCard($giftCardItem, $userObj);
-        dd($eGifterResponse);
 
         if (array_key_exists("previousOrderIds", $eGifterResponse)) {
             return response()->json([
@@ -219,7 +218,7 @@ class HomeController extends Controller
             $name = $user->email;
         }
         $token = $this->getAuthToken();
-
+        dd($token);
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $token
         ])->post(env('EGITFTER_URL') . '/v1/Orders',
