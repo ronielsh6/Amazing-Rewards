@@ -48,7 +48,7 @@ let GiftCardsTable = function() {
             columns: [
                 { data: 'get_owner', render: function(data, type) {
                     if(this.userId === 0) {
-                        return data['name'] ? data['name'] : data['email'];
+                        return data['email'];
                     }
 
                     return '<img src="'+this.giftCardImage+'" class="giftcard-miniature">'
