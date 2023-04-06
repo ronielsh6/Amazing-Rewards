@@ -162,6 +162,35 @@ class AdminController extends Controller
         }
     }
 
+    public function pollfishCallback(Request $request)
+    {
+        $secret_key = "6d2a7c79-6fac-4bd6-89fc-565eb66a48b7";
+        $cpa = rawurldecode($_GET["cpa"]);
+        $device_id = rawurldecode($_GET["device_id"]);
+        $request_uuid = rawurldecode($_GET["request_uuid"]);
+        $reward_name = rawurldecode($_GET["reward_name"]);
+        $reward_value = rawurldecode($_GET["reward_value"]);
+        $timestamp = rawurldecode($_GET["timestamp"]);
+        $tx_id = rawurldecode($_GET["tx_id"]);
+        $url_signature = rawurldecode($_GET["signature"]);
+
+        $data = $cpa . ":" . $device_id;
+        if (!empty($request_uuid)) { // only added when non-empty
+            $data = $data . ":" . $request_uuid;
+        }
+        $data = $data . ":" . $reward_name . ":" . $reward_value . ":" . $timestamp . ":" . $tx_id;
+
+        $computed_signature = base64_encode(hash_hmac("sha1" , $data, $secret_key, true));
+        $is_valid = $url_signature == $computed_signature;
+
+        if ($is_valid){
+            $user = User::where('id', $request_uuid)->first();
+            $user->points += $reward_value;
+            $user->save();
+            Log::info($user->email. ' earned '.  $reward_value . 'points from Pollfish');
+        }
+    }
+
     public function generateUniqueCode()
     {
 

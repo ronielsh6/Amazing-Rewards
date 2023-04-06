@@ -24,6 +24,7 @@ Route::group(['prefix' => 'auth'], function () {
     Route::post('googleAuth', 'App\Http\Controllers\Api\AuthController@googleAuth');
 });
 Route::post('inbrainCallback','App\Http\Controllers\Api\AdminController@inBrainsCallback');
+Route::post('pollfishCallback','App\Http\Controllers\Api\AdminController@pollfishCallback');
 Route::get('adJoeCallback','App\Http\Controllers\Api\AdminController@adJoeCallback');
 Route::get('egifterOrders','App\Http\Controllers\Api\AdminController@getEgifterOrders');
 Route::post('sendCustomNotification','App\Http\Controllers\Api\AdminController@sendCustomNotification');
