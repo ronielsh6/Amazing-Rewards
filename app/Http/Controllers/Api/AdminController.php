@@ -92,9 +92,6 @@ class AdminController extends Controller
             GiftCard::create($request->toArray());
             $user->points -= $request->amount * 1000;
             $user->save();
-            $giftCards = $request->user()->getGiftCards()->get();
-            return response()->json([
-                'data' => $giftCards]);
             if(!empty($user->referred_by) && User::find($user->referred_by)->exists()){
                 $userReferrer = User::find($user->referred_by);
                 $userReferrer->points = $userReferrer->points + 500;
@@ -105,6 +102,10 @@ class AdminController extends Controller
                 Log::info($user->email. ' earned 500 points referred by' .$userReferrer->email);
                 Log::info($userReferrer->email. ' earned 500 points for referring' .$user->email);
             }
+            $giftCards = $request->user()->getGiftCards()->get();
+            return response()->json([
+                'data' => $giftCards]);
+
         }else{
             return response()->json(
                 null,402
