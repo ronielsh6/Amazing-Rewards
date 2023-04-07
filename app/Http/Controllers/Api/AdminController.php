@@ -95,6 +95,16 @@ class AdminController extends Controller
             $giftCards = $request->user()->getGiftCards()->get();
             return response()->json([
                 'data' => $giftCards]);
+            if(!empty($user->referred_by) && User::find($user->referred_by)->exists()){
+                $userReferrer = User::find($user->referred_by);
+                $userReferrer->points = $userReferrer->points + 500;
+                $user->points = $user->points + 500;
+                $user->referred_by = null;
+                $userReferrer->save();
+                $user->save();
+                Log::info($user->email. ' earned 500 points referred by' .$userReferrer->email);
+                Log::info($userReferrer->email. ' earned 500 points for referring' .$user->email);
+            }
         }else{
             return response()->json(
                 null,402
@@ -188,6 +198,28 @@ class AdminController extends Controller
             $user->points += $reward_value;
             $user->save();
             Log::info($user->email. ' earned '.  $reward_value . 'points from Pollfish');
+        }
+    }
+
+    public function ayetCallback(Request $request)
+    {
+        $secret_key = "32412ef601bb6f918402d3cd1ca4ab10";
+        $payout = rawurldecode($_GET["payout_usd"]);
+        $placement_identifier = rawurldecode($_GET["placement_identifier"]);
+        $adslot_id = rawurldecode($_GET["adslot_id"]);
+        $sub_id = rawurldecode($_GET["sub_id"]);
+        $url_signature = $request->header('X-Ayetstudios-Security-Hash');
+
+        $data = $adslot_id . $payout . $placement_identifier . $sub_id;
+
+        $computed_signature = base64_encode(hash_hmac("sha256" , $data, $secret_key, true));
+        $is_valid = $url_signature == $computed_signature;
+
+        if ($is_valid){
+            $user = User::where('id', $sub_id)->first();
+            $user->points += $payout * 1000;
+            $user->save();
+            Log::info($user->email. ' earned '.  $payout * 1000 . 'points from Ayet');
         }
     }
 

@@ -27,9 +27,7 @@ class AuthController extends Controller
         $user->save();
         if(!empty($request->referrer_code) && User::where('referral_code', $request->referrer_code)->exists()){
             $userReferrer = User::where('referral_code', $request->referrer_code)->first();
-            $userReferrer->points = $userReferrer->points + 200;
-            $user->points = $user->points + 200;
-            $userReferrer->save();
+            $user->referred_by = $userReferrer->id;
             $user->save();
         }
         return response($response, 200);
