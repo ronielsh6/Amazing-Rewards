@@ -220,7 +220,7 @@ class AdminController extends Controller
             $user = User::where('id', $sub_id)->first();
             $user->points += $payout * 1000;
             $user->save();
-            Log::info($user->email. ' earned '.  $payout * 1000 . 'points from Ayet');
+            Log::info($user->email. ' earned '.  $payout * 300 . 'points from Ayet');
         }
     }
 
