@@ -258,10 +258,16 @@ class AdminController extends Controller
                 $user->save();
                 Log::info($user->email. ' earned '.  $request->coinAmount. 'points from AdJoe');
             } else {
-                $requestLog = str_replace("'", "\'", json_encode($request->all()));
-                Log::info('Incorrect userId from AdJoe' . $requestLog);
+                $user = User::where('advertising_id', $request->userId)->first();
+                if ($user != null){
+                    $user->points += $request->coinAmount;
+                    $user->save();
+                    Log::info($user->email. ' earned '.  $request->coinAmount. 'points from AdJoe');
+                } else {
+                    $requestLog = str_replace("'", "\'", json_encode($request->all()));
+                    Log::info('Incorrect userId from AdJoe' . $requestLog);
+                }
             }
-
             return response()->json(null, 200);
         } else {
             return response()->json(null, 403);
