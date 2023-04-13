@@ -253,9 +253,14 @@ class AdminController extends Controller
         $localSig = sha1(($request->transId . $request->userId . $request->currency . $request->coinAmount . $request->deviceId . $request->sdkAppId . $s2sToken));
         if ($localSig == $request->sid) {
             $user = User::where('id', $request->userId)->first();
-            $user->points += $request->coinAmount;
-            $user->save();
-            Log::info($user->email. ' earned '.  $request->coinAmount. 'points from AdJoe');
+            if ($user != null){
+                $user->points += $request->coinAmount;
+                $user->save();
+                Log::info($user->email. ' earned '.  $request->coinAmount. 'points from AdJoe');
+            } else {
+                Log::info('Incorrect userId from AdJoe' . $request->json());
+            }
+
             return response()->json(null, 200);
         } else {
             return response()->json(null, 403);
