@@ -258,7 +258,7 @@ class AdminController extends Controller
                 $user->save();
                 Log::info($user->email. ' earned '.  $request->coinAmount. 'points from AdJoe');
             } else {
-                Log::info('Incorrect userId from AdJoe' . $request);
+                Log::info('Incorrect userId from AdJoe' . $request->all());
             }
 
             return response()->json(null, 200);
