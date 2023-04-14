@@ -42,3 +42,4 @@ Route::post('/campaigns/update', [App\Http\Controllers\CampaignController::class
 Route::post('/campaigns/delete', [App\Http\Controllers\CampaignController::class, 'deleteCampaign'])->name('deleteCampaign');
 Route::post('/campaigns/execute', [App\Http\Controllers\CampaignController::class, 'executeCampaign'])->name('executeCampaign');
 Route::post('/campaigns/queryImpact', [App\Http\Controllers\CampaignController::class, 'queryImpact'])->name('queryImpact');
+Route::get('logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index']);
