@@ -258,7 +258,7 @@ class AdminController extends Controller
                 $user->save();
                 Log::info($user->email. ' earned '.  $request->coinAmount. 'points from AdJoe');
             } else {
-                $user = User::where('advertising_id', $request->userId)->first();
+                $user = User::where('advertising_id', $request->deviceId)->first();
                 if ($user != null){
                     $user->points += $request->coinAmount;
                     $user->save();
