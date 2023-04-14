@@ -152,14 +152,14 @@ class AdminController extends Controller
             if ($datum['level'] == 'info'){
                 list($email, , $points, $gid, , $source) = explode(" ", $datum['text']);
                 $date = $datum['date'];
-                if ($user->email == $email){
+//                if ($user->email == $email){
                     $result[$count] = [
                         'email' => $email,
                         'points' => $points,
                         'date' => $date
                     ];
                     $count ++;
-                }
+//                }
             }
         }
 
