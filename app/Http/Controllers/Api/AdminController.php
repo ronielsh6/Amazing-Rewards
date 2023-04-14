@@ -165,7 +165,7 @@ class AdminController extends Controller
         }
 
         return response()->json([
-            'data' => $data]);
+            'data' => $result]);
     }
 
     public function updateFcmToken(Request $request){
