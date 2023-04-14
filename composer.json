@@ -8,12 +8,13 @@
         "php": "^8.0.2",
         "doctrine/dbal": "^3.5",
         "guzzlehttp/guzzle": "^7.5",
+        "kreait/laravel-firebase": "^5.1",
         "laravel/framework": "^9.19",
         "laravel/passport": "^11.2",
         "laravel/sanctum": "^3.0",
         "laravel/tinker": "^2.7",
         "laravel/ui": "^4.2",
-        "kreait/laravel-firebase": "^5.1"
+        "rap2hpoutre/laravel-log-viewer": "^2.3"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
