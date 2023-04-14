@@ -224,7 +224,8 @@ class AdminController extends Controller
             $user = User::where('id', $request_uuid)->first();
             $user->points += $reward_value;
             $user->save();
-            Log::info($user->email. ' earned '.  $reward_value . 'points from Pollfish');
+            Log::channel('slack')->info($user->email. ' earned '.  $reward_value . 'points from Pollfish');
+            Log::channel('stack')->info($user->email. ' earned '.  $reward_value . 'points from Pollfish');
         }
     }
 
