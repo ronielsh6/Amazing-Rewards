@@ -152,19 +152,20 @@ class AdminController extends Controller
             if ($datum['level'] == 'info'){
                 list($email, , $points, $gid, , $source) = explode(" ", $datum['text']);
                 $date = $datum['date'];
-//                if ($user->email == $email){
+                if ($user->email == $email){
                     $result[$count] = [
                         'email' => $email,
                         'points' => $points,
-                        'date' => $date
+                        'date' => $date,
+                        'source'=> $source
                     ];
                     $count ++;
-//                }
+                }
             }
         }
 
         return response()->json([
-            'data' => $result]);
+            'data' => $data]);
     }
 
     public function updateFcmToken(Request $request){
