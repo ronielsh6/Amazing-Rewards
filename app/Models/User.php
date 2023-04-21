@@ -23,7 +23,11 @@ class User extends Authenticatable
         'email',
         'password',
         'admin',
-        'fcm_token'
+        'fcm_token',
+        'country',
+        'ip_address',
+        'status',
+        'device_id'
     ];
 
     /**
@@ -52,7 +56,7 @@ class User extends Authenticatable
 
     public function isAdmin()
     {
-        return $this->attributes['admin'] === 1;
+        return $this->attributes['admin'] === 0;
     }
 
     /**

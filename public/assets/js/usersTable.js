@@ -51,7 +51,7 @@ let UsersTable = function() {
                     } },
                 { data: 'updated_at' },
                 { data: 'id', render: function(data, type) {
-                    return "<a class='btn btn-success text-white'><i class='material-icons opacity-10'>send</i></a><a class='btn btn-warning text-white'><i class='material-icons opacity-10'>redeem</i></a><a class='btn btn-danger text-white'><i class='material-icons opacity-10'>delete</i></a>"
+                    return "<a class='btn btn-success text-white'><i class='material-icons opacity-10'>send</i></a><a class='btn btn-warning text-white'><i class='material-icons opacity-10'>redeem</i></a><a class='btn btn-danger text-white'><i class='material-icons opacity-10'>block</i></a>"
                 }}
             ],
             filter: false,

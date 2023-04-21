@@ -180,6 +180,9 @@ class AdminController extends Controller
         if($request->app_version != null){
             $user->app_version = $request->app_version;
         }
+        if($request->device_id != null){
+            $user->device_id = $request->device_id;
+        }
             $user->touch();
             $user->save();
             return response()->json([
