@@ -8,16 +8,14 @@ use App\Recargas;
 use App\GiftCard;
 use App\User;
 use Carbon\Carbon;
-use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use DateTime;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Messaging\Notification;
+use Rap2hpoutre\LaravelLogViewer\LaravelLogViewer;
 
 class AdminController extends Controller
 {
@@ -140,6 +138,35 @@ class AdminController extends Controller
         $user->points += $request->points;
 
         return response()->json($user);
+    }
+
+    public function getPointsLogs(Request $request)
+    {   $user = User::find($request->user()->id);
+        $log_viewer = new LaravelLogViewer();
+        $result = [];
+        $count = 0;
+        $data = [
+            'logs' => $log_viewer->all(),
+        ];
+        foreach ($data['logs'] as $datum){
+            if ($datum['level'] == 'info'){
+                list($email,$action , $points, , $source) = explode(" ", $datum['text']);
+                $date = $datum['date'];
+//                if ($user->email == $email){
+                    $result[$count] = [
+                        'email' => $email,
+                        'points' => $points,
+                        'date' => $date,
+                        'action' =>$action,
+                        'source'=> $source
+                    ];
+                    $count ++;
+//                }
+            }
+        }
+
+        return response()->json([
+            'data' => $result]);
     }
 
     public function updateFcmToken(Request $request){
