@@ -200,7 +200,7 @@ class AdminController extends Controller
         $ip = $request->ip();
         $ip_data = @json_decode(file_get_contents("http://www.geoplugin.net/json.gp?ip=" . $ip), true, 512, JSON_THROW_ON_ERROR);
 
-        if ($ip_data->country_name !== $request->country or !\in_array($request->country, self::ALLOWED_COUNTRIES))
+        if ($ip_data['geoplugin_countryName'] !== $request->country or !\in_array($request->country, self::ALLOWED_COUNTRIES))
         {
             return response()->json(
                 ['message' => 'You`re forbidden to use this app'],

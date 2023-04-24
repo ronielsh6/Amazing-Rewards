@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -19,7 +20,17 @@ class AuthController extends Controller
             return response(['errors'=>$validator->errors()->all()], 422);
         }
         $request['password']=Hash::make($request['password']);
-        $user = User::create($request->toArray());
+        try {
+            $user = User::create($request->toArray());
+        }catch (QueryException $queryException) {
+            $errorCode = $queryException->getCode();
+            if ((int)$errorCode === 23000) {
+                return response()->json(
+                    ['message' => 'deviceIdValidationError'],
+                    409
+                );
+            }
+        }
 
         $token = $user->createToken('Laravel Password Grant Client')->accessToken;
         $response = ['token' => $token];
