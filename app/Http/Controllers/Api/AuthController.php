@@ -82,7 +82,17 @@ class AuthController extends Controller
                 $response = ['token' => $token];
         } else {
             $request['password'] = Hash::make($request['password']);
-            $user = User::create($request->toArray());
+            try {
+                $user = User::create($request->toArray());
+            }catch (QueryException $queryException) {
+                $errorCode = $queryException->getCode();
+                if ((int)$errorCode === 23000) {
+                    return response()->json(
+                        ['message' => 'deviceIdValidationError'],
+                        409
+                    );
+                }
+            }
             $token = $user->createToken('Laravel Password Grant Client')->accessToken;
             $response = ['token' => $token];
         }
