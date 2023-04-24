@@ -29,7 +29,11 @@ class User extends Authenticatable
         'country',
         'ip_address',
         'status',
-        'device_id'
+        'device_id',
+        'points',
+        'referral_code',
+        'email_verified_at',
+        'email_verification_code'
     ];
 
     /**
@@ -53,7 +57,12 @@ class User extends Authenticatable
 
     public function getGiftCards()
     {
-        return $this->hasMany(GiftCard::class,'owner','id');
+        return $this->hasMany(GiftCard::class, 'owner', 'id');
+    }
+
+    public function getPoints()
+    {
+        return \Auth::user()->points;
     }
 
     public function isAdmin()
@@ -69,5 +78,16 @@ class User extends Authenticatable
         User::factory()
             ->count(50)
             ->create();
+    }
+
+    /**
+     * Send the password reset notification.
+     *
+     * @param  string  $token
+     * @return void
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new ResetPasswordNotification($token));
     }
 }

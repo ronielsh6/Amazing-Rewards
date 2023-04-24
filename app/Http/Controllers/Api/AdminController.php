@@ -177,7 +177,7 @@ class AdminController extends Controller
         {
             return response()->json(
                 ['message' => 'You`re forbidden to use this app'],
-                ['status' => 409]
+                409
             );
         }
 
