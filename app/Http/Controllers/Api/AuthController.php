@@ -1,11 +1,10 @@
 <?php
 namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
-use App\User;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -14,6 +13,7 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6',
+            'device_id' => 'required|string|unique:users'
         ]);
         if ($validator->fails())
         {
@@ -21,6 +21,7 @@ class AuthController extends Controller
         }
         $request['password']=Hash::make($request['password']);
         $user = User::create($request->toArray());
+
         $token = $user->createToken('Laravel Password Grant Client')->accessToken;
         $response = ['token' => $token];
         $user->referral_code = $this->generateUniqueCode();
@@ -59,6 +60,7 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'email' => 'required|string|email|max:255',
+            'device_id' => 'required|string|unique:users'
         ]);
         if ($validator->fails())
         {
@@ -84,13 +86,32 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'email' => 'required|string|email|max:255',
             'password' => 'required|string|min:6',
+            'device_id' => 'required|string|unique:users'
         ]);
         if ($validator->fails())
         {
             return response(['errors'=>$validator->errors()->all()], 422);
         }
         $user = User::where('email', $request->email)->first();
+
         if ($user) {
+
+            $device_id = $request->device_id;
+
+            if ($user->device_id !== null and $user->device_id !== $device_id) {
+                return response()->json(
+                    ['message' => 'deviceIdValidationError'],
+                    409
+                );
+            }
+
+            if ($user->device_id === null) {
+                $user->device_id = $device_id;
+            }
+
+            $user->touch();
+            $user->save();
+
             if (Hash::check($request->password, $user->password)) {
                 $token = $user->createToken('Laravel Password Grant Client')->accessToken;
                 $response = ['token' => $token];
@@ -123,10 +144,4 @@ class AuthController extends Controller
         }
         return response()->json($request->user());
     }
-
-//     public function isLoggedOut(): Response
-//     {
-//         return response()->json([
-//             'message' => 'Successfully legged out'],201);
-//     }
 }

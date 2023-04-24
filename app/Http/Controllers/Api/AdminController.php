@@ -19,6 +19,7 @@ use Rap2hpoutre\LaravelLogViewer\LaravelLogViewer;
 
 class AdminController extends Controller
 {
+    private const ALLOWED_COUNTRIES = ['Spain', 'Germany', 'United States'];
 
     public function getGiftCards(Request $request)
     {
@@ -169,35 +170,48 @@ class AdminController extends Controller
             'data' => $result]);
     }
 
-    public function updateFcmToken(Request $request){
+    /**
+     * @throws \JsonException
+     */
+    public function updateFcmToken(Request $request)
+    {
         $user = User::find($request->user()->id);
 
-        if($user->fcm_token != $request->fcm_token){
+        if ($user->fcm_token != $request->fcm_token) {
             $user->fcm_token = $request->fcm_token;
         }
 
-        if($user->advertising_id === null){
+        if ($user->advertising_id === null) {
             $user->advertising_id = $request->advertising_id;
         }
 
-        if($request->app_version !== null){
+        if ($request->app_version !== null) {
             $user->app_version = $request->app_version;
         }
 
-        if($request->device_id !== null and $user->device_id === null){
+        if ($request->device_id !== null and $user->device_id === null) {
             $user->device_id = $request->device_id;
         }
 
-        if($request->country !== null and $user->country === null){
+        if ($request->country !== null and $user->country === null) {
             $user->country = $request->country;
         }
 
-        dump($request->ip());
-        die();
-            $user->touch();
-            $user->save();
-            return response()->json([
-                'data' => $user->updated_at]);
+        $ip = $request->ip();
+        $ip_data = @json_decode(file_get_contents("http://www.geoplugin.net/json.gp?ip=" . $ip), true, 512, JSON_THROW_ON_ERROR);
+
+        if ($ip_data->country_name !== $request->country or !\in_array($request->country, self::ALLOWED_COUNTRIES))
+        {
+            return response()->json(
+                ['message' => 'You`re forbidden to use this app'],
+                409
+            );
+        }
+
+        $user->touch();
+        $user->save();
+        return response()->json([
+            'data' => $user->updated_at]);
     }
 
 
