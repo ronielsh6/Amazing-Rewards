@@ -1,4 +1,4 @@
-let UsersTable = function() {
+let BlockedUsersTable = function() {
     let dataUri = '';
     let deleteUri = '';
     let sendMessageUri = '';
@@ -16,7 +16,7 @@ let UsersTable = function() {
     }
 
     let declare = function(){
-        let datatable =$('#usersTable').DataTable({
+        let datatable =$('#blockedUsersTable').DataTable({
             language: {
                 processing: "Loading data ...",
                 emptyTable: "There are no records to show",
@@ -51,7 +51,7 @@ let UsersTable = function() {
                     } },
                 { data: 'updated_at' },
                 { data: 'id', render: function(data, type) {
-                    return "<a class='btn btn-success text-white'><i class='material-icons opacity-10'>send</i></a><a class='btn btn-warning text-white'><i class='material-icons opacity-10'>redeem</i></a><a class='btn btn-danger text-white'><i class='material-icons opacity-10'>block</i></a>"
+                    return "<a class='btn btn-success text-white'><i class='material-icons opacity-10'>check</i></a>"
                 }}
             ],
             filter: false,
@@ -126,25 +126,18 @@ let UsersTable = function() {
             $('#customId').val(0);
         });
 
-        $('#usersTable tbody').on('click', 'a', function() {
+        $('#blockedUsersTable tbody').on('click', 'a', function() {
             var data = datatable.row( $(this).parents('tr') ).data();
             let $class = this.classList;
-            if(jQuery.inArray('btn-warning', $class) !== -1){
-                watchRedeem(data['id']);
-            }
-            if(jQuery.inArray('btn-danger', $class) !== -1){
-                deleteElement(data);
-            }
             if(jQuery.inArray('btn-success', $class) !== -1){
-                $('#customId').val(data['id']);
-                $('#messageModal').modal('show');
+                deleteElement(data);
             }
         });
 
         let deleteElement = function(data) {
             swal({
                 title: "Are you sure?",
-                text: "Are you sure that you want to block this user?",
+                text: "Are you sure that you want to enable again this user?",
                 icon: "warning",
                 buttons: true,
                 dangerMode: true,

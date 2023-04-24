@@ -27,6 +27,8 @@ Auth::routes([
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::get('/users', [App\Http\Controllers\HomeController::class, 'getUsers'])->name('getUsers');
+Route::get('/blacklist', [App\Http\Controllers\HomeController::class, 'blacklist'])->name('blacklist');
+Route::get('/blockedUsers', [App\Http\Controllers\HomeController::class, 'blockedUsers'])->name('blockedUsers');
 Route::post('/user/delete', [App\Http\Controllers\HomeController::class, 'deleteUsers'])->name('deleteUser');
 
 Route::get('/user/giftcards', [App\Http\Controllers\HomeController::class, 'getUserGiftCards'])->name('showGiftCards');
