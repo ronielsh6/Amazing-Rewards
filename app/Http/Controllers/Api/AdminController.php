@@ -171,18 +171,29 @@ class AdminController extends Controller
 
     public function updateFcmToken(Request $request){
         $user = User::find($request->user()->id);
+
         if($user->fcm_token != $request->fcm_token){
             $user->fcm_token = $request->fcm_token;
         }
+
         if($user->advertising_id === null){
             $user->advertising_id = $request->advertising_id;
         }
+
         if($request->app_version !== null){
             $user->app_version = $request->app_version;
         }
+
         if($request->device_id !== null and $user->device_id === null){
             $user->device_id = $request->device_id;
         }
+
+        if($request->country !== null and $user->country === null){
+            $user->country = $request->country;
+        }
+
+        dump($request->ip());
+        die();
             $user->touch();
             $user->save();
             return response()->json([
