@@ -27,6 +27,14 @@
     </a>
   </li>
   <li class="nav-item">
+      <a class="nav-link text-white @if(Route::is('blacklist')) active @endif" href="{{ route('blacklist') }}">
+          <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">block</i>
+          </div>
+          <span class="nav-link-text ms-1">Black List</span>
+      </a>
+  </li>
+  <li class="nav-item">
     <a class="nav-link text-white @if(Route::is('showGiftCards')) active @endif" href="{{ route('showGiftCards') }}">
         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
           <i class="material-icons opacity-10">redeem</i>

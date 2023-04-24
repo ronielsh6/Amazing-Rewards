@@ -33,6 +33,16 @@ class HomeController extends Controller
         return view('home');
     }
 
+    /**
+     * Show the application dashboard.
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function blacklist()
+    {
+        return view('blacklist');
+    }
+
     public function getUsers(Request $request)
     {
         $start = $request->get('start');
@@ -43,7 +53,50 @@ class HomeController extends Controller
         $orderElement = $request->get('order')[0];
         $orderDir = $orderElement['dir'];
         $column = $request->get('columns')[$orderElement['column']]['data'];
-        $usersQuery = DB::table('users')->where('id', '>', 0);
+        $usersQuery = DB::table('users')->where('status', '=', 'active');
+
+        if (!empty($username)) {
+            $usersQuery->where(function ($query) use ($username) {
+                $query->where('email', 'like', '%' . $username . '%');
+            });
+        }
+
+        if (!empty($points)) {
+            $between = \explode(',', $points);
+            if (\count($between) > 1) {
+                $usersQuery->whereBetween('points', $between);
+            }
+
+            if (\count($between) === 1) {
+                $usersQuery->where('points', $relative, $points);
+            }
+        }
+        $usersQuery->orderBy($column, $orderDir);
+        $totalRecordsFiltered = $usersQuery->get()->count();
+        if ($start > 0) {
+            $offset = ($start / $page);
+            $usersQuery->offset($offset * $page);
+        }
+        $usersQuery->limit($page);
+        $users = $usersQuery->get()->toArray();
+        return response()->json([
+            'data' => $users,
+            'recordsTotal' => $totalRecordsFiltered,
+            'recordsFiltered' => $totalRecordsFiltered
+        ]);
+    }
+
+    public function blockedUsers(Request $request)
+    {
+        $start = $request->get('start');
+        $page = $request->get('length');
+        $username = $request->get('username');
+        $relative = $request->get('relative');
+        $points = $request->get('points');
+        $orderElement = $request->get('order')[0];
+        $orderDir = $orderElement['dir'];
+        $column = $request->get('columns')[$orderElement['column']]['data'];
+        $usersQuery = DB::table('users')->where('status', '=', 'blocked');
 
         if (!empty($username)) {
             $usersQuery->where(function ($query) use ($username) {
@@ -80,7 +133,19 @@ class HomeController extends Controller
     {
         $userId = $request->get('user');
         $user = User::find($userId);
-        $user->delete();
+
+        $destinationStatus = \array_diff(User::USER_STATUS, [$user->status]);
+        $status = \array_values($destinationStatus)[0];
+        $user->status = $status;
+
+        if ($status === 'blocked') {
+            GiftCard::with('getOwner')
+                ->where('owner', $user->id)
+                ->where('pending', 1)
+                ->delete();
+        }
+
+        $user->save();
 
         return response()->json([
             'code' => 200,

@@ -13,6 +13,8 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    public const USER_STATUS = ['active', 'blocked'];
+
     /**
      * The attributes that are mass assignable.
      *
