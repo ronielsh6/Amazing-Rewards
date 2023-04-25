@@ -16,9 +16,10 @@ class CheckRole
      */
     public function handle(Request $request, Closure $next)
     {
-        if(!$request->user()->isAdmin()) {
+        if (! $request->user()->isAdmin()) {
             abort(401, 'This action is unauthorized.');
         }
+
         return $next($request);
     }
 }

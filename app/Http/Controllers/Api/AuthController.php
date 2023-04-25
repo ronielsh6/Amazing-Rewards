@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Http\Controllers\Api;
+
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Exception;
@@ -17,16 +19,15 @@ class AuthController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6',
         ]);
-        if ($validator->fails())
-        {
+        if ($validator->fails()) {
             return response(['errors'=>$validator->errors()->all()], 422);
         }
-        $request['password']=Hash::make($request['password']);
+        $request['password'] = Hash::make($request['password']);
         try {
             $user = User::create($request->toArray());
-        }catch (QueryException $queryException) {
+        } catch (QueryException $queryException) {
             $errorCode = $queryException->getCode();
-            if ((int)$errorCode === 23000) {
+            if ((int) $errorCode === 23000) {
                 return response()->json(
                     ['message' => 'deviceIdValidationError'],
                     409
@@ -38,11 +39,12 @@ class AuthController extends Controller
         $response = ['token' => $token];
         $user->referral_code = $this->generateUniqueCode();
         $user->save();
-        if(!empty($request->referrer_code) && User::where('referral_code', $request->referrer_code)->exists()){
+        if (! empty($request->referrer_code) && User::where('referral_code', $request->referrer_code)->exists()) {
             $userReferrer = User::where('referral_code', $request->referrer_code)->first();
             $user->referred_by = $userReferrer->id;
             $user->save();
         }
+
         return response($response, 200);
     }
 
@@ -51,12 +53,11 @@ class AuthController extends Controller
      */
     private function generateUniqueCode(): string
     {
-
         $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $charactersNumber = strlen($characters);
         $codeLength = 6;
 
-        $code = "";
+        $code = '';
 
         while (strlen($code) < 6) {
             $position = random_int(0, $charactersNumber - 1);
@@ -76,21 +77,20 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'email' => 'required|string|email|max:255',
         ]);
-        if ($validator->fails())
-        {
+        if ($validator->fails()) {
             return response()->json(['errors'=>$validator->errors()->all()], 422);
         }
         $user = User::where('email', $request->email)->first();
         if ($user) {
-                $token = $user->createToken('Laravel Password Grant Client')->accessToken;
-                $response = ['token' => $token];
+            $token = $user->createToken('Laravel Password Grant Client')->accessToken;
+            $response = ['token' => $token];
         } else {
             $request['password'] = Hash::make($request['password']);
             try {
                 $user = User::create($request->toArray());
-            }catch (QueryException $queryException) {
+            } catch (QueryException $queryException) {
                 $errorCode = $queryException->getCode();
-                if ((int)$errorCode === 23000) {
+                if ((int) $errorCode === 23000) {
                     return response()->json(
                         ['message' => 'deviceIdValidationError'],
                         409
@@ -113,19 +113,16 @@ class AuthController extends Controller
 
     public function login(Request $request): JsonResponse
     {
-
         $validator = Validator::make($request->all(), [
             'email' => 'required|string|email|max:255',
-            'password' => 'required|string|min:6'
+            'password' => 'required|string|min:6',
         ]);
-        if ($validator->fails())
-        {
+        if ($validator->fails()) {
             return response()->json(['errors'=>$validator->errors()->all()], 422);
         }
         $user = User::where('email', $request->email)->first();
 
         if ($user) {
-
             $device_id = $request->device_id;
 
             if ($user->device_id !== null and $user->device_id !== $device_id) {
@@ -145,33 +142,35 @@ class AuthController extends Controller
             if (Hash::check($request->password, $user->password)) {
                 $token = $user->createToken('Laravel Password Grant Client')->accessToken;
                 $response = ['token' => $token];
+
                 return response()->json($response, 200);
             }
 
-            $response = ["message" => "Password mismatch"];
+            $response = ['message' => 'Password mismatch'];
+
             return response()->json($response, 422);
         }
 
-        $response = ["message" =>'User does not exist'];
-        return response()->json($response, 422);
+        $response = ['message' =>'User does not exist'];
 
+        return response()->json($response, 422);
     }
 
     public function logout(Request $request)
     {
         $request->user()->token()->revoke();
-        return response()->json(['message' =>
-            'Successfully logged out']);
-    }
 
+        return response()->json(['message' => 'Successfully logged out']);
+    }
 
     public function user(Request $request)
     {
         $user = User::find($request->user()->id);
-        if (empty($user->referral_code)){
+        if (empty($user->referral_code)) {
             $user->referral_code = $this->generateUniqueCode();
             $user->save();
         }
+
         return response()->json($request->user());
     }
 }

@@ -14,17 +14,18 @@ class CloudMessages
     {
         $messaging = app('firebase.messaging');
 
-        if (!empty($user->fcm_token)) {
+        if (! empty($user->fcm_token)) {
             $message = CloudMessage::withTarget('token', $user->fcm_token)
                 ->withNotification(Notification::create($title, $body))
                 ->withData($data);
 
             try {
                 $result = $messaging->send($message);
-            }catch (FirebaseException $exception) {
+            } catch (FirebaseException $exception) {
                 if ($logs) {
-                    Log::info($exception->getMessage() . ' Exception generated for user ' . $user->email);
+                    Log::info($exception->getMessage().' Exception generated for user '.$user->email);
                 }
+
                 return false;
             }
 
@@ -34,7 +35,7 @@ class CloudMessages
         }
 
         if ($logs) {
-            Log::info('User ' . $user->email . ' has not FCM token.');
+            Log::info('User '.$user->email.' has not FCM token.');
         }
 
         return false;

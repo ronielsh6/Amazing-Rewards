@@ -31,6 +31,6 @@ class BuildMail extends Mailable
      */
     public function build()
     {
-        return $this->markdown('email.emailVerificationEmail')->with('user',$this->user);
+        return $this->markdown('email.emailVerificationEmail')->with('user', $this->user);
     }
 }

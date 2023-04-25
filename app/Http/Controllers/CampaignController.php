@@ -47,10 +47,11 @@ class CampaignController extends Controller
         }
         $campaignsQuery->limit($page);
         $campaigns = $campaignsQuery->get()->toArray();
+
         return response()->json([
             'data' => $campaigns,
             'recordsTotal' => $totalRecordsFiltered,
-            'recordsFiltered' => $totalRecordsFiltered
+            'recordsFiltered' => $totalRecordsFiltered,
         ]);
     }
 
@@ -61,39 +62,40 @@ class CampaignController extends Controller
         if ($campaign) {
             return response()->json([
                 'code' => 200,
-                'message' => 'Campaign created successfully'
+                'message' => 'Campaign created successfully',
             ]);
         }
+
         return response()->json([
             'code' => 400,
-            'message' => 'Error creating campaign'
+            'message' => 'Error creating campaign',
         ]);
     }
 
     public function updateCampaign(Request $request)
     {
         $id = $request->get('campaign_id');
-        $campaignData = \array_filter($request->all(), static function($item) {
+        $campaignData = \array_filter($request->all(), static function ($item) {
             return $item !== '_token' && $item !== 'campaign_id';
-        },ARRAY_FILTER_USE_KEY);
+        }, ARRAY_FILTER_USE_KEY);
         $result = Campaign::where('id', $id)
             ->update($campaignData);
 
         if ($result > 0) {
             return response()->json([
                 'code' => 200,
-                'message' => 'Campaign updated successfully'
+                'message' => 'Campaign updated successfully',
             ]);
         }
+
         return response()->json([
             'code' => 400,
-            'message' => 'Error updating campaign'
+            'message' => 'Error updating campaign',
         ]);
     }
 
     public function deleteCampaign(Request $request)
     {
-
     }
 
     public function executeCampaign(Request $request)
@@ -108,17 +110,19 @@ class CampaignController extends Controller
         $dateTime = new \DateTime('now');
 
         $errors = false;
-        $startTime = date("h:i:s");
+        $startTime = date('h:i:s');
         foreach ($users as $user) {
             ProcessCampaign::dispatch(new CloudMessages(), $user, $campaign);
         }
+
         return response()->json([
             'code' => 200,
-            'message' => 'Campaign executed successfully'
+            'message' => 'Campaign executed successfully',
         ]);
     }
 
-    public function queryImpact(Request $request) {
+    public function queryImpact(Request $request)
+    {
         $query = $request->get('query');
         $users = User::with('getGiftCards')
             ->whereRaw($query)
@@ -126,7 +130,7 @@ class CampaignController extends Controller
 
         return response()->json([
             'code' => 200,
-            'total' => $users
+            'total' => $users,
         ]);
     }
 }

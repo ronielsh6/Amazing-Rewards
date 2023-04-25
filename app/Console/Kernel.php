@@ -17,7 +17,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-         $schedule->call(new CampaignJobs)->everyThirtyMinutes();
+        $schedule->call(new CampaignJobs)->everyThirtyMinutes();
     }
 
     /**
