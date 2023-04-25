@@ -2,7 +2,9 @@
 namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Exception;
 use Illuminate\Database\QueryException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -44,7 +46,10 @@ class AuthController extends Controller
         return response($response, 200);
     }
 
-    private function generateUniqueCode()
+    /**
+     * @throws Exception
+     */
+    private function generateUniqueCode(): string
     {
 
         $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -54,7 +59,7 @@ class AuthController extends Controller
         $code = "";
 
         while (strlen($code) < 6) {
-            $position = rand(0, $charactersNumber - 1);
+            $position = random_int(0, $charactersNumber - 1);
             $character = $characters[$position];
             $code = $code.$character;
         }
@@ -66,15 +71,14 @@ class AuthController extends Controller
         return $code;
     }
 
-    public function googleAuth(Request $request)
+    public function googleAuth(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'email' => 'required|string|email|max:255',
-            'device_id' => 'required|string|unique:users'
         ]);
         if ($validator->fails())
         {
-            return response(['errors'=>$validator->errors()->all()], 422);
+            return response()->json(['errors'=>$validator->errors()->all()], 422);
         }
         $user = User::where('email', $request->email)->first();
         if ($user) {
@@ -97,10 +101,17 @@ class AuthController extends Controller
             $response = ['token' => $token];
         }
 
-        return response($response, 200);
+        if ($user->device_id !== $request->device_id) {
+            return response()->json(
+                ['message' => 'deviceIdValidationError'],
+                409
+            );
+        }
+
+        return response()->json($response, 200);
     }
 
-    public function login(Request $request)
+    public function login(Request $request): JsonResponse
     {
 
         $validator = Validator::make($request->all(), [
@@ -109,7 +120,7 @@ class AuthController extends Controller
         ]);
         if ($validator->fails())
         {
-            return response(['errors'=>$validator->errors()->all()], 422);
+            return response()->json(['errors'=>$validator->errors()->all()], 422);
         }
         $user = User::where('email', $request->email)->first();
 
@@ -134,15 +145,15 @@ class AuthController extends Controller
             if (Hash::check($request->password, $user->password)) {
                 $token = $user->createToken('Laravel Password Grant Client')->accessToken;
                 $response = ['token' => $token];
-                return response($response, 200);
-            } else {
-                $response = ["message" => "Password mismatch"];
-                return response($response, 422);
+                return response()->json($response, 200);
             }
-        } else {
-            $response = ["message" =>'User does not exist'];
-            return response($response, 422);
+
+            $response = ["message" => "Password mismatch"];
+            return response()->json($response, 422);
         }
+
+        $response = ["message" =>'User does not exist'];
+        return response()->json($response, 422);
 
     }
 
