@@ -1,7 +1,4 @@
 let BlockedUsersTable = function() {
-    let dataUri = '';
-    let deleteUri = '';
-    let sendMessageUri = '';
 
     let setUri = function(dataUri) {
         this.dataUri =dataUri;
@@ -37,20 +34,25 @@ let BlockedUsersTable = function() {
 
             },
             columnDefs: [
+                { 'targets': 0, 'searchable': false, 'orderable': false, 'className': 'dt-body-center', 'render': function (data) {
+                        return '<input type="checkbox" id="chkUsers" name="chkUsers" value="' + $('<div/>').text(data).html() + '">';
+                    }
+                },
                 {"className": "dt-center", "targets": "_all"},
                 {"className": "dt-center", "targets": "updated_at", render: DataTable.render.datetime()},
                 { 'orderable': false, targets: [3] }
             ],
             columns: [
+                { data: 'id'},
                 { data: 'email' },
                 { data: 'points' },
-                { data: 'created_at', render: function (data, type) {
+                { data: 'created_at', render: function (data) {
                     let currentDate = moment(new Date);
                     let createdAtDate = moment(data);
                     return (currentDate.diff(createdAtDate, 'days'))+ ' days';
                     } },
                 { data: 'updated_at' },
-                { data: 'id', render: function(data, type) {
+                { data: 'id', render: function() {
                     return "<a class='btn btn-success text-white'><i class='material-icons opacity-10'>check</i></a>"
                 }}
             ],
@@ -66,6 +68,38 @@ let BlockedUsersTable = function() {
 
         $('#filterData').on('click', function() {
             datatable.ajax.reload();
+        });
+
+        $('#example-select-all').on('click', function(){
+            // Get all rows with search applied
+            var rows = datatable.rows({ 'search': 'applied' }).nodes();
+            // Check/uncheck checkboxes for all rows in the table
+            $('input[type="checkbox"]', rows).prop('checked', this.checked);
+
+            if (this.checked) {
+                $('#enableUsers').show();
+            } else {
+                $('#enableUsers').hide();
+            }
+        });
+
+        $('#blockedUsersTable tbody').on('change', 'input[type="checkbox"]', function(){
+            let chkbs = $('#blockedUsersTable tbody input[type="checkbox"]:checked');
+            if (chkbs.length > 0) {
+                $('#enableUsers').show();
+            } else {
+                $('#enableUsers').hide();
+            }
+        });
+
+        $('#enableUsers').on('click', function () {
+            let items = [];
+            let checked = $('#blockedUsersTable tbody input[type="checkbox"]:checked');
+            checked.each(function (id, obj) {
+                let data = datatable.row($(obj).parents('tr')).data();
+                items.push(data);
+            });
+            deleteElement(items, true);
         });
 
         $('#sendMessage').on('click', function() {
@@ -134,17 +168,25 @@ let BlockedUsersTable = function() {
             }
         });
 
-        let deleteElement = function(data) {
+        let deleteElement = function(data, array = false) {
+            let message = 'Are you sure that you want to enable';
+            message += array ? ' those users?' : ' this user?';
             swal({
                 title: "Are you sure?",
-                text: "Are you sure that you want to enable again this user?",
+                text: message,
                 icon: "warning",
                 buttons: true,
                 dangerMode: true,
             })
                 .then((willDelete) => {
                     if (willDelete) {
-                        sendDelete(data);
+                        if (array) {
+                            data.forEach(item => {
+                                sendDelete(item);
+                            })
+                        }else {
+                            sendDelete(data);
+                        }
                     }
                 });
         }
@@ -178,11 +220,6 @@ let BlockedUsersTable = function() {
                         });
                     }
                 });
-        }
-
-        let watchRedeem = function(id) {
-            $('#user-id-redeem').val(id);
-            $('#userRedeemForm').trigger('submit');
         }
 
     }
