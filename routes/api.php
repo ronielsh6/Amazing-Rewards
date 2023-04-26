@@ -23,14 +23,13 @@ Route::group(['prefix' => 'auth'], function () {
     Route::post('signup', 'App\Http\Controllers\Api\AuthController@signup');
     Route::post('googleAuth', 'App\Http\Controllers\Api\AuthController@googleAuth');
 });
-Route::post('inbrainCallback','App\Http\Controllers\Api\AdminController@inBrainsCallback');
-Route::post('pollfishCallback','App\Http\Controllers\Api\AdminController@pollfishCallback');
-Route::get('adJoeCallback','App\Http\Controllers\Api\AdminController@adJoeCallback');
-Route::get('egifterOrders','App\Http\Controllers\Api\AdminController@getEgifterOrders');
-Route::post('sendCustomNotification','App\Http\Controllers\Api\AdminController@sendCustomNotification');
+Route::post('inbrainCallback', 'App\Http\Controllers\Api\AdminController@inBrainsCallback');
+Route::post('pollfishCallback', 'App\Http\Controllers\Api\AdminController@pollfishCallback');
+Route::get('adJoeCallback', 'App\Http\Controllers\Api\AdminController@adJoeCallback');
+Route::get('egifterOrders', 'App\Http\Controllers\Api\AdminController@getEgifterOrders');
+Route::post('sendCustomNotification', 'App\Http\Controllers\Api\AdminController@sendCustomNotification');
 
-
-Route::group(['middleware' => 'auth:api', 'namespace'], function() {
+Route::group(['middleware' => 'auth:api', 'namespace'], function () {
     Route::get('logout', 'App\Http\Controllers\Api\AuthController@logout');
     Route::get('user', 'App\Http\Controllers\Api\AuthController@user');
     Route::get('cards', 'App\Http\Controllers\Api\AdminController@getGiftCards');

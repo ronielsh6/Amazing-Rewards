@@ -23,7 +23,7 @@ class Execution extends Model
      * @var array
      */
     protected $fillable = [
-        'date', 'start_at', 'end_at', 'errors', 'parameters'
+        'date', 'start_at', 'end_at', 'errors', 'parameters',
     ];
 
     public function campaign(): BelongsTo

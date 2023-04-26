@@ -8,7 +8,6 @@ use App\Services\CloudMessages;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
-use function MongoDB\BSON\toJSON;
 
 class HomeController extends Controller
 {
@@ -55,13 +54,13 @@ class HomeController extends Controller
         $column = $request->get('columns')[$orderElement['column']]['data'];
         $usersQuery = DB::table('users')->where('status', '=', 'active');
 
-        if (!empty($username)) {
+        if (! empty($username)) {
             $usersQuery->where(function ($query) use ($username) {
-                $query->where('email', 'like', '%' . $username . '%');
+                $query->where('email', 'like', '%'.$username.'%');
             });
         }
 
-        if (!empty($points)) {
+        if (! empty($points)) {
             $between = \explode(',', $points);
             if (\count($between) > 1) {
                 $usersQuery->whereBetween('points', $between);
@@ -79,10 +78,11 @@ class HomeController extends Controller
         }
         $usersQuery->limit($page);
         $users = $usersQuery->get()->toArray();
+
         return response()->json([
             'data' => $users,
             'recordsTotal' => $totalRecordsFiltered,
-            'recordsFiltered' => $totalRecordsFiltered
+            'recordsFiltered' => $totalRecordsFiltered,
         ]);
     }
 
@@ -98,13 +98,13 @@ class HomeController extends Controller
         $column = $request->get('columns')[$orderElement['column']]['data'];
         $usersQuery = DB::table('users')->where('status', '=', 'blocked');
 
-        if (!empty($username)) {
+        if (! empty($username)) {
             $usersQuery->where(function ($query) use ($username) {
-                $query->where('email', 'like', '%' . $username . '%');
+                $query->where('email', 'like', '%'.$username.'%');
             });
         }
 
-        if (!empty($points)) {
+        if (! empty($points)) {
             $between = \explode(',', $points);
             if (\count($between) > 1) {
                 $usersQuery->whereBetween('points', $between);
@@ -122,10 +122,11 @@ class HomeController extends Controller
         }
         $usersQuery->limit($page);
         $users = $usersQuery->get()->toArray();
+
         return response()->json([
             'data' => $users,
             'recordsTotal' => $totalRecordsFiltered,
-            'recordsFiltered' => $totalRecordsFiltered
+            'recordsFiltered' => $totalRecordsFiltered,
         ]);
     }
 
@@ -149,15 +150,16 @@ class HomeController extends Controller
 
         return response()->json([
             'code' => 200,
-            'message' => 'User deleted sucessfully'
+            'message' => 'User deleted sucessfully',
         ]);
     }
 
     public function getUserGiftCards(Request $request)
     {
         $userId = $request->get('user-id');
+
         return view('giftCards', [
-            'userId' => $userId
+            'userId' => $userId,
         ]);
     }
 
@@ -170,7 +172,7 @@ class HomeController extends Controller
         $orderDir = $orderElement['dir'];
         $column = $request->get('columns')[$orderElement['column']]['data'];
         $giftCardsQuery = GiftCard::with(['getOwner']);
-        if (!empty($userId) && $userId !== 0) {
+        if (! empty($userId) && $userId !== 0) {
             $giftCardsQuery->where('owner', $userId);
         }
         $totalRecordsFiltered = $giftCardsQuery->get()->count();
@@ -180,29 +182,27 @@ class HomeController extends Controller
             $giftCardsQuery->offset($offset * $page);
         }
 
-
         $giftCardsQuery->orderBy($column, $orderDir);
         $giftCardsQuery->limit($page);
         $giftcards = $giftCardsQuery->get()->toArray();
+
         return response()->json([
             'data' => $giftcards,
             'recordsTotal' => $totalRecordsFiltered,
-            'recordsFiltered' => $totalRecordsFiltered
+            'recordsFiltered' => $totalRecordsFiltered,
         ]);
     }
-
 
     private function getAuthToken()
     {
         $response = Http::withHeaders([
             'AccessToken' => env('EGITFTER_ACCESS_TOKEN'),
-//            'AccessToken' => 'b9wh1nc1br1nt9nc9r69k16br9t2d710l9t11v1981nt989l16nd2v0nd0nh9r0j', PROD
-            'Email' => 'info@myamazingrewards.com'
-        ])->post(env('EGITFTER_URL') . '/v1/Tokens');
+            //            'AccessToken' => 'b9wh1nc1br1nt9nc9r69k16br9t2d710l9t11v1981nt989l16nd2v0nd0nh9r0j', PROD
+            'Email' => 'info@myamazingrewards.com',
+        ])->post(env('EGITFTER_URL').'/v1/Tokens');
 
-        return $response->json("value");
+        return $response->json('value');
     }
-
 
     public function getEnabledGiftCard(Request $request)
     {
@@ -214,29 +214,27 @@ class HomeController extends Controller
         $giftCardItem = DB::table('gift_card')->where('id', $giftcard)
             ->where('owner', $user)->first();
 
-
-        if (!$giftCardItem) {
+        if (! $giftCardItem) {
             return response()->json([
                 'code' => 400,
-                'message' => 'Data error'
+                'message' => 'Data error',
             ]);
         }
 
         $eGifterResponse = $this->generateEgifterCard($giftCardItem, $userObj);
 
-        if (array_key_exists("previousOrderIds", $eGifterResponse)) {
+        if (array_key_exists('previousOrderIds', $eGifterResponse)) {
             return response()->json([
                 'code' => 400,
-                'message' => 'Gift Card Id Already exist in eGifter.'
+                'message' => 'Gift Card Id Already exist in eGifter.',
             ]);
         }
         $giftCard = GiftCard::find($giftcard);
-        $giftCard->claim_link = $eGifterResponse["lineItems"][0]["claimData"][0]["claimLink"];
-        $giftCard->challenge_code = $eGifterResponse["lineItems"][0]["claimData"][0]["claimLinkChallengeAnswer"];
-        $giftCard->egifter_id = $eGifterResponse["id"];
+        $giftCard->claim_link = $eGifterResponse['lineItems'][0]['claimData'][0]['claimLink'];
+        $giftCard->challenge_code = $eGifterResponse['lineItems'][0]['claimData'][0]['claimLinkChallengeAnswer'];
+        $giftCard->egifter_id = $eGifterResponse['id'];
         $giftCard->touch();
         $giftCard->save();
-
 
         $affectedRows = DB::table('gift_card')->where('id', $giftcard)
             ->where('owner', $user)
@@ -245,13 +243,13 @@ class HomeController extends Controller
         if ($affectedRows > 0) {
             return response()->json([
                 'code' => 200,
-                'message' => 'Gift Card was activated successfully.'
+                'message' => 'Gift Card was activated successfully.',
             ]);
         }
 
         return response()->json([
             'code' => 400,
-            'message' => 'Data error'
+            'message' => 'Data error',
         ]);
     }
 
@@ -265,45 +263,44 @@ class HomeController extends Controller
         foreach ($ids as $id) {
             $user = User::find($id);
             $response = (new CloudMessages())->sendMessage($title, $body, $user, ['deep_link' => $deepLink]);
-            if (!$response) {
+            if (! $response) {
                 $errors = true;
             }
         }
 
         return response()->json([
             'code' => 200,
-            'errors' => $errors
+            'errors' => $errors,
         ]);
     }
 
     private function generateEgifterCard($card, $user)
     {
         $name = $user->name;
-        if($name == null){
+        if ($name == null) {
             $name = $user->email;
         }
         $token = $this->getAuthToken();
 
         $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $token
-        ])->post(env('EGITFTER_URL') . '/v1/Orders',
+            'Authorization' => 'Bearer '.$token,
+        ])->post(env('EGITFTER_URL').'/v1/Orders',
             ['lineItems' => [[
                 'productId' => 'AMAZON',
                 'quantity' => 1,
                 'value' => $card->amount,
                 'digitalDeliveryAddress' => [
-                    'email' => $user->email
+                    'email' => $user->email,
                 ],
                 'personalization' => [
                     'fromName' => 'Amazing Rewards',
-                    'to' => $name
-                ]
+                    'to' => $name,
+                ],
             ]],
-                'poNumber' => $user->email . '' . $card->id,
+                'poNumber' => $user->email.''.$card->id,
                 'type' => 'Links',
-                'note' => $user->email
+                'note' => $user->email,
             ]);
-
 
         return $response->json();
     }

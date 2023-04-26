@@ -17,8 +17,11 @@ class ProcessCampaign implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     private CloudMessages $cloudMessages;
+
     private User $user;
+
     private Campaign $campaign;
+
     /**
      * Create a new job instance.
      *
@@ -28,8 +31,7 @@ class ProcessCampaign implements ShouldQueue
         CloudMessages $cloudMessages,
         User $user,
         Campaign $campaign
-    )
-    {
+    ) {
         $this->campaign = $campaign;
         $this->user = $user;
         $this->cloudMessages = $cloudMessages;

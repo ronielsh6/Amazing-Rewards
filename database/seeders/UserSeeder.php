@@ -22,7 +22,7 @@ class UserSeeder extends Seeder
             'email' => Str::random(10).'@gmail.com',
             'password' => Hash::make('password'),
             'email_verified_at' => new \DateTime('now'),
-            'app_version' => ''
+            'app_version' => '',
         ]);
     }
 }

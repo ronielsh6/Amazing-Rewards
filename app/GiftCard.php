@@ -1,8 +1,8 @@
 <?php
 
 namespace App;
-use Illuminate\Database\Eloquent\Model;
 
+use Illuminate\Database\Eloquent\Model;
 
 class GiftCard extends Model
 {
@@ -19,13 +19,11 @@ class GiftCard extends Model
      * @var array
      */
     protected $fillable = [
-        'amount', 'status', 'claim_link', 'egifter_id','challenge_code', 'pending', 'owner',
+        'amount', 'status', 'claim_link', 'egifter_id', 'challenge_code', 'pending', 'owner',
     ];
-
 
     public function getOwner()
     {
-        return $this->hasOne(User::class,'id','owner');
+        return $this->hasOne(User::class, 'id', 'owner');
     }
-
 }

@@ -1,15 +1,15 @@
 <?php
 
 namespace App;
-use Carbon\Carbon;
-use Illuminate\Notifications\Notifiable;
+
 use App\Notifications\ResetPasswordNotification;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Carbon\Carbon;
 use Illuminate\Auth\Passwords\CanResetPassword;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
-
 
 class User extends Authenticatable
 {
@@ -22,7 +22,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'points', 'referral_code', 'fcm_token', 'email_verified_at', 'email_verification_code'
+        'name', 'email', 'password', 'points', 'referral_code', 'fcm_token', 'email_verified_at', 'email_verification_code',
     ];
 
     /**
@@ -50,9 +50,8 @@ class User extends Authenticatable
 
     public function getGiftCards()
     {
-        return $this->hasMany(GiftCard::class,'owner','id');
+        return $this->hasMany(GiftCard::class, 'owner', 'id');
     }
-
 
     /**
      * Send the password reset notification.
@@ -64,5 +63,4 @@ class User extends Authenticatable
     {
         $this->notify(new ResetPasswordNotification($token));
     }
-
 }

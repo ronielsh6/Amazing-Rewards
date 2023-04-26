@@ -34,7 +34,7 @@ class User extends Authenticatable
         'points',
         'referral_code',
         'email_verified_at',
-        'email_verification_code'
+        'email_verification_code',
     ];
 
     /**
@@ -76,7 +76,7 @@ class User extends Authenticatable
      */
     public function run(): void
     {
-        User::factory()
+        self::factory()
             ->count(50)
             ->create();
     }
