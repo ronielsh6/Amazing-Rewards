@@ -87,6 +87,20 @@ class AdminController extends Controller
         $request['owner'] = $request->user()->id;
         $user = User::find($request->user()->id);
         if ($user->points >= $request->amount * 1000) {
+            $ip = $request->ip();
+            $ip_data = @json_decode(file_get_contents('http://www.geoplugin.net/json.gp?ip='.$ip), true, 512, JSON_THROW_ON_ERROR);
+            $denied = false;
+
+            if (!\in_array($ip_data['geoplugin_countryName'], [$request->country, $user->country], true) or !\in_array($request->country, self::ALLOWED_COUNTRIES, true)) {
+                $user->status = 'blocked';
+                $user->touch();
+                $user->save();
+                return response()->json(
+                    ['message' => 'You`re forbidden to use this app'],
+                    409
+                );
+            }
+
             GiftCard::create($request->toArray());
             $user->points -= $request->amount * 1000;
             $user->save();
@@ -167,24 +181,8 @@ class AdminController extends Controller
             $user->country = $request->country;
         }
 
-        $ip = $request->ip();
-        $ip_data = @json_decode(file_get_contents('http://www.geoplugin.net/json.gp?ip='.$ip), true, 512, JSON_THROW_ON_ERROR);
-        $denied = false;
-
-        if ($ip_data['geoplugin_countryName'] !== $request->country or ! \in_array($request->country, self::ALLOWED_COUNTRIES)) {
-            $user->status = 'blocked';
-            $denied = true;
-        }
-
         $user->touch();
         $user->save();
-
-        if ($denied) {
-            return response()->json(
-                ['message' => 'You`re forbidden to use this app'],
-                409
-            );
-        }
 
         return response()->json([
             'data' => $user->updated_at, ]);
