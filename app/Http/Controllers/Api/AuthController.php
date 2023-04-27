@@ -146,7 +146,7 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if ($user) {
-            $isBlocked = $user->getDevices()->where('status', 'blocked')->get();
+            $isBlocked = $user->getDevices()->where('device.status', 'blocked')->get();
             if ($isBlocked->count() > 0 or $user->status === 'blocked') {
                 return response()->json(
                     ['message' => 'userBlocked'],
@@ -156,9 +156,9 @@ class AuthController extends Controller
 
             $device_id = $request->device_id;
 
-            $existDevice = $user->getDevices()->find($device_id);
+            $existDevice = $user->getDevices()->where('device.device_id', $device_id)->get();
 
-            if ($existDevice === null) {
+            if ($existDevice < 1) {
                 $device = new Device([
                     'device_id' => $device_id,
                     'status' => 'active',
