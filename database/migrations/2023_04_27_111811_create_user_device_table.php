@@ -16,7 +16,6 @@ return new class extends Migration {
             $table->id();
             $table->unsignedBigInteger('device_id');
             $table->unsignedBigInteger('user_id');
-            $table->timestamps();
 
             $table->foreign('device_id')
                 ->references('id')
