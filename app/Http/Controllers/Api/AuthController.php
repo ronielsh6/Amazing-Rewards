@@ -156,7 +156,7 @@ class AuthController extends Controller
 
             $device_id = $request->device_id;
 
-            $existDevice = $user->getDevices()->where('device.device_id', $device_id)->get();
+            $existDevice = $user->getDevices()->where('device.device_id', $device_id)->count();
 
             if ($existDevice < 1) {
                 $device = new Device([
