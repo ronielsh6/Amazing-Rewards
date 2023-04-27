@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\GiftCard;
 use App\Http\Controllers\Controller;
 use App\Mail\BuildMail;
+use App\Models\Device;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -206,12 +207,30 @@ class AdminController extends Controller
             $user->app_version = $request->app_version;
         }
 
-        if ($request->device_id !== null and $user->device_id === null) {
-            $user->device_id = $request->device_id;
+        if ($request->device_id !== null) {
+            $device = $user->getDevices()->where('device.device_id', $request->device_id)->get()->count();
+            if ($device < 1) {
+                $newDevice = new Device([
+                    'device_id' => $request->device_id,
+                    'status' => 'active',
+                ]);
+                $newDevice->save();
+                $user->getDevices()->attach($newDevice);
+            }
         }
 
         if ($request->country !== null and $user->country === null) {
             $user->country = $request->country;
+        }
+
+        $ip = $request->ip();
+        $ip_data = @json_decode(file_get_contents('http://www.geoplugin.net/json.gp?ip='.$ip), true, 512, JSON_THROW_ON_ERROR);
+
+        if (! \in_array($ip_data['geoplugin_countryName'], [$request->country, $user->country], true) or ! \in_array($request->country, self::ALLOWED_COUNTRIES, true)) {
+            $user->status = 'blocked';
+            $user->getDevices()->update(['status' => 'blocked']);
+            $user->touch();
+            $user->save();
         }
 
         $user->touch();
