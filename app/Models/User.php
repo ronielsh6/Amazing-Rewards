@@ -91,4 +91,9 @@ class User extends Authenticatable
     {
         $this->notify(new ResetPasswordNotification($token));
     }
+
+    public function getDevices()
+    {
+        return $this->belongsToMany(Device::class, 'user_device', 'user_id', 'device_id');
+    }
 }
