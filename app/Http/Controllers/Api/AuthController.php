@@ -31,13 +31,19 @@ class AuthController extends Controller
                 409
             );
         }
-        $newDevice = new Device([
-            'device_id' => $request->device_id,
-            'status' => 'active',
-        ]);
-        $newDevice->save();
+        $existDevice = Device::where('device_id', $request->device_id)->first();
         $user = User::create($request->toArray());
-        $user->getDevices()->attach($newDevice);
+
+        if ($existDevice) {
+            $user->getDevices()->attach($existDevice);
+        } else {
+            $newDevice = new Device([
+                'device_id' => $request->device_id,
+                'status' => 'active',
+            ]);
+            $newDevice->save();
+            $user->getDevices()->attach($newDevice);
+        }
 
         $token = $user->createToken('Laravel Password Grant Client')->accessToken;
         $response = ['token' => $token];
@@ -103,32 +109,25 @@ class AuthController extends Controller
 
             $token = $user->createToken('Laravel Password Grant Client')->accessToken;
             $response = ['token' => $token];
-            $deviceExist = $user->getDevices()->where('device.device_id', $request->device_id)->first();
-            if (! $deviceExist) {
-                $device_id = $request->device_id;
-                $device = new Device([
-                    'device_id' => $device_id,
-                    'status' => 'active',
-                ]);
-                $device->save();
-                $user->getDevices()->attach($device);
-            } elseif ($deviceExist->status === 'blocked') {
-                return response()->json(
-                    ['message' => 'userForbidden'],
-                    403
-                );
-            }
         } else {
             $request['password'] = Hash::make($request['password']);
             $user = User::create($request->toArray());
+            $user->getDevices()->attach($device);
+            $token = $user->createToken('Laravel Password Grant Client')->accessToken;
+            $response = ['token' => $token];
+        }
+
+        $deviceExist = Device::where('device.device_id', $request->device_id)->first();
+        if (! $deviceExist) {
+            $device_id = $request->device_id;
             $device = new Device([
-                'device_id' => $request->device_id,
+                'device_id' => $device_id,
                 'status' => 'active',
             ]);
             $device->save();
             $user->getDevices()->attach($device);
-            $token = $user->createToken('Laravel Password Grant Client')->accessToken;
-            $response = ['token' => $token];
+        } else {
+            $user->getDevices()->attach($deviceExist);
         }
 
         return response()->json($response, 200);
@@ -146,19 +145,16 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if ($user) {
-            $isBlocked = $user->getDevices()->where('device.status', 'blocked')->get();
-            if ($isBlocked->count() > 0 or $user->status === 'blocked') {
-                return response()->json(
-                    ['message' => 'userBlocked'],
-                    403
-                );
+            if ($user->status === 'blocked') {
+                return response()->json([
+                    'message'=> 'userForbidden',
+                ], 403);
             }
 
             $device_id = $request->device_id;
+            $existDevice = Device::where('device.device_id', $device_id)->first();
 
-            $existDevice = $user->getDevices()->where('device.device_id', $device_id)->count();
-
-            if ($existDevice < 1) {
+            if (! $existDevice) {
                 $device = new Device([
                     'device_id' => $device_id,
                     'status' => 'active',
@@ -166,6 +162,8 @@ class AuthController extends Controller
 
                 $device->save();
                 $user->getDevices()->attach($device);
+            } else {
+                $user->getDevices()->attach($existDevice);
             }
 
             $user->touch();

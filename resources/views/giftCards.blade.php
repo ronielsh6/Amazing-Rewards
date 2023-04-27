@@ -29,7 +29,7 @@
                             <table class="table align-items-center mb-0" id="giftcardsTable">
                                 <thead>
                                 <tr>
-                                    <th><input type="checkbox" name="select_all" value="1" id="example-select-all"></th>
+{{--                                    <th><input type="checkbox" name="select_all" value="1" id="example-select-all"></th>--}}
                                     <th>Gift Card</th>
                                     <th>Amount</th>
                                     <th>Status</th>

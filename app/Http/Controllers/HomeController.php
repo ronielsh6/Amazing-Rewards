@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\GiftCard;
+use App\Models\Device;
 use App\Models\User;
 use App\Services\CloudMessages;
+use Google\CRC32\Table;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -138,6 +140,11 @@ class HomeController extends Controller
         $destinationStatus = \array_diff(User::USER_STATUS, [$user->status]);
         $status = \array_values($destinationStatus)[0];
         $user->status = $status;
+        $user->getDevices()->update(['status' => $status]);
+        $devices = $user->getDevices()->get();
+        foreach ($devices as $device) {
+            $device->getUsers()->update(['status' => $status]);
+        }
 
         if ($status === 'blocked') {
             GiftCard::with('getOwner')
