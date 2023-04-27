@@ -24,30 +24,20 @@ class AuthController extends Controller
             return response(['errors'=>$validator->errors()->all()], 422);
         }
         $request['password'] = Hash::make($request['password']);
-        try {
-            $device = Device::where('device_id', $request->device_id)->where('status', 'blocked')->get();
-            if ($device->count() > 0) {
-                return response()->json(
-                    ['message' => 'deviceIdValidationForbidden'],
-                    409
-                );
-            }
-            $newDevice = new Device([
-                'device_id' => $request->device_id,
-                'status' => 'active',
-            ]);
-            $newDevice->save();
-            $user = User::create($request->toArray());
-            $user->getDevices()->attach($newDevice);
-        } catch (QueryException $queryException) {
-            $errorCode = $queryException->getCode();
-            if ((int) $errorCode === 23000) {
-                return response()->json(
-                    ['message' => 'deviceIdValidationError'],
-                    409
-                );
-            }
+        $device = Device::where('device_id', $request->device_id)->where('status', 'blocked')->get();
+        if ($device->count() > 0) {
+            return response()->json(
+                ['message' => 'deviceIdValidationForbidden'],
+                409
+            );
         }
+        $newDevice = new Device([
+            'device_id' => $request->device_id,
+            'status' => 'active',
+        ]);
+        $newDevice->save();
+        $user = User::create($request->toArray());
+        $user->getDevices()->attach($newDevice);
 
         $token = $user->createToken('Laravel Password Grant Client')->accessToken;
         $response = ['token' => $token];
@@ -102,44 +92,43 @@ class AuthController extends Controller
                 409
             );
         }
-        $user = User::where('email', $request->email)->where('status', 'active')->first();
+        $user = User::where('email', $request->email)->first();
         if ($user) {
+            if ($user->status === 'blocked') {
+                return response()->json(
+                    ['message' => 'userForbidden'],
+                    403
+                );
+            }
+
             $token = $user->createToken('Laravel Password Grant Client')->accessToken;
             $response = ['token' => $token];
-            if ($user->getDevices()->where('device_id', $request->device_id)->count() < 1) {
+            $deviceExist = $user->getDevices()->where('device.device_id', $request->device_id)->first();
+            if (! $deviceExist) {
+                $device_id = $request->device_id;
                 $device = new Device([
-                    'device_id' => $request->device_id,
+                    'device_id' => $device_id,
                     'status' => 'active',
                 ]);
+                $device->save();
                 $user->getDevices()->attach($device);
+            } elseif ($deviceExist->status === 'blocked') {
+                return response()->json(
+                    ['message' => 'userForbidden'],
+                    403
+                );
             }
         } else {
             $request['password'] = Hash::make($request['password']);
-            try {
-                $user = User::create($request->toArray());
-                $device = new Device([
-                    'device_id' => $request->device_id,
-                    'status' => 'active',
-                ]);
-                $user->getDevices()->attach($device);
-            } catch (QueryException $queryException) {
-                $errorCode = $queryException->getCode();
-                if ((int) $errorCode === 23000) {
-                    return response()->json(
-                        ['message' => 'deviceIdValidationError'],
-                        409
-                    );
-                }
-            }
+            $user = User::create($request->toArray());
+            $device = new Device([
+                'device_id' => $request->device_id,
+                'status' => 'active',
+            ]);
+            $device->save();
+            $user->getDevices()->attach($device);
             $token = $user->createToken('Laravel Password Grant Client')->accessToken;
             $response = ['token' => $token];
-        }
-
-        if ($user->device_id !== $request->device_id) {
-            return response()->json(
-                ['message' => 'deviceIdValidationError'],
-                409
-            );
         }
 
         return response()->json($response, 200);
