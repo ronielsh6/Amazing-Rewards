@@ -30,7 +30,6 @@ class User extends Authenticatable
         'country',
         'ip_address',
         'status',
-        'device_id',
         'points',
         'referral_code',
         'email_verified_at',
