@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Device;
 use App\Models\User;
 use Exception;
 use Illuminate\Database\QueryException;
@@ -24,7 +25,20 @@ class AuthController extends Controller
         }
         $request['password'] = Hash::make($request['password']);
         try {
+            $device = Device::where('device_id', $request->device_id)->where('status', 'blocked')->get();
+            if ($device->count() > 0) {
+                return response()->json(
+                    ['message' => 'deviceIdValidationForbidden'],
+                    409
+                );
+            }
+            $newDevice = new Device([
+                'device_id' => $request->device_id,
+                'status' => 'active',
+            ]);
+            $newDevice->save();
             $user = User::create($request->toArray());
+            $user->getDevices()->attach($newDevice);
         } catch (QueryException $queryException) {
             $errorCode = $queryException->getCode();
             if ((int) $errorCode === 23000) {
@@ -80,14 +94,34 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors'=>$validator->errors()->all()], 422);
         }
-        $user = User::where('email', $request->email)->first();
+
+        $device = Device::where('device_id', $request->device_id)->where('status', 'blocked')->get();
+        if ($device->count() > 0) {
+            return response()->json(
+                ['message' => 'deviceIdValidationForbidden'],
+                409
+            );
+        }
+        $user = User::where('email', $request->email)->where('status', 'active')->first();
         if ($user) {
             $token = $user->createToken('Laravel Password Grant Client')->accessToken;
             $response = ['token' => $token];
+            if ($user->getDevices()->where('device_id', $request->device_id)->count() < 1) {
+                $device = new Device([
+                    'device_id' => $request->device_id,
+                    'status' => 'active',
+                ]);
+                $user->getDevices()->attach($device);
+            }
         } else {
             $request['password'] = Hash::make($request['password']);
             try {
                 $user = User::create($request->toArray());
+                $device = new Device([
+                    'device_id' => $request->device_id,
+                    'status' => 'active',
+                ]);
+                $user->getDevices()->attach($device);
             } catch (QueryException $queryException) {
                 $errorCode = $queryException->getCode();
                 if ((int) $errorCode === 23000) {
@@ -123,17 +157,26 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if ($user) {
-            $device_id = $request->device_id;
-
-            if ($user->device_id !== null and $user->device_id !== $device_id) {
+            $isBlocked = $user->getDevices()->where('status', 'blocked')->get();
+            if ($isBlocked->count() > 0 or $user->status === 'blocked') {
                 return response()->json(
-                    ['message' => 'deviceIdValidationError'],
-                    409
+                    ['message' => 'userBlocked'],
+                    403
                 );
             }
 
-            if ($user->device_id === null) {
-                $user->device_id = $device_id;
+            $device_id = $request->device_id;
+
+            $existDevice = $user->getDevices()->find($device_id);
+
+            if ($existDevice === null) {
+                $device = new Device([
+                    'device_id' => $device_id,
+                    'status' => 'active',
+                ]);
+
+                $device->save();
+                $user->getDevices()->attach($device);
             }
 
             $user->touch();

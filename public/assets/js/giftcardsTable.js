@@ -42,10 +42,15 @@ let GiftCardsTable = function() {
 
             },
             columnDefs: [
+                { 'targets': 0, 'searchable': false, 'orderable': false, 'className': 'dt-body-center', 'render': function (data) {
+                        return '<input type="checkbox" id="chkUsers" name="chkUsers" value="' + $('<div/>').text(data).html() + '">';
+                    }
+                },
                 {"className": "dt-center", "targets": "_all"},
                 { 'orderable': false, targets: notOrderColumns }
             ],
             columns: [
+                { data: 'id'},
                 { data: 'get_owner', render: function(data, type) {
                     if(this.userId === 0) {
                         return data['email'];
@@ -80,7 +85,7 @@ let GiftCardsTable = function() {
             paging: true,
             processing: true,
             serverSide: true,
-            order: [[1, 'asc']],
+            order: [[2, 'asc']],
             ordering: true,
             lengthMenu: [[50, 100, 200, -1], [50, 100, 200, 'ALL']],
             DisplayLenght: 50,
@@ -91,12 +96,44 @@ let GiftCardsTable = function() {
             enableGiftCard(data);
         });
 
+        $('#example-select-all').on('click', function(){
+            // Get all rows with search applied
+            var rows = datatable.rows({ 'search': 'applied' }).nodes();
+            // Check/uncheck checkboxes for all rows in the table
+            $('input[type="checkbox"]', rows).prop('checked', this.checked);
 
+            if (this.checked) {
+                $('#activateCards').show();
+            } else {
+                $('#activateCards').hide();
+            }
+        });
 
-        let enableGiftCard = function(data) {
+        $('#giftcardsTable tbody').on('change', 'input[type="checkbox"]', function(){
+            let chkbs = $('#giftcardsTable tbody input[type="checkbox"]:checked');
+            if (chkbs.length > 0) {
+                $('#activateCards').show();
+            } else {
+                $('#activateCards').hide();
+            }
+        });
+
+        $('#activateCards').on('click', function () {
+            let items = [];
+            let checked = $('#giftcardsTable tbody input[type="checkbox"]:checked');
+            checked.each(function (id, obj) {
+                let data = datatable.row($(obj).parents('tr')).data();
+                items.push(data);
+            });
+            enableGiftCard(items, true);
+        });
+
+        let enableGiftCard = function(data, array = false) {
+            let message = 'Are you sure that you want to enable';
+            message += array ? ' all these gift cards' : ' a gift card with a value of $'+data['amount']+'?';
             swal({
                 title: "Are you sure?",
-                text: 'Are you sure that you want to enable a gift card with a value of $'+data['amount']+'?',
+                text: message,
                 icon: "warning",
                 buttons: true,
                 dangerMode: true,

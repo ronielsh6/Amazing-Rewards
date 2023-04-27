@@ -94,6 +94,7 @@ class AdminController extends Controller
 
             if (! \in_array($ip_data['geoplugin_countryName'], [$request->country, $user->country], true) or ! \in_array($request->country, self::ALLOWED_COUNTRIES, true)) {
                 $user->status = 'blocked';
+                $user->getDevices()->update(['status' => 'blocked']);
                 $user->touch();
                 $user->save();
 
