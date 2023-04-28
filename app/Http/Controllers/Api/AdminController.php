@@ -169,6 +169,7 @@ class AdminController extends Controller
         ];
         foreach ($data['logs'] as $datum) {
             if ($datum['level'] === 'info') {
+                dd($datum['text']);
                 list($email, $action, $points, , $source) = explode(' ', $datum['text']);
                 $date = $datum['date'];
                 if ($user->email == $email){
