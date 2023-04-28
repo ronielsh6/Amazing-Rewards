@@ -6,7 +6,7 @@ use App\GiftCard;
 use App\Http\Controllers\Controller;
 use App\Mail\BuildMail;
 use App\Models\Device;
-use App\User;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
