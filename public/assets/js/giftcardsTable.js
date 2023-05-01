@@ -135,8 +135,7 @@ let GiftCardsTable = function() {
                 { data: 'pending', render: function(data, type) {
                         return "<a class='btn btn-warning text-white'><i class='material-icons opacity-10'>cancel</i></a>"
                     } },
-                { data: 'created_at', render: DataTable.render.datetime() },
-                { data: 'challenge_code' }
+                { data: 'created_at', render: DataTable.render.datetime() }
             ],
             filter: false,
             paging: true,

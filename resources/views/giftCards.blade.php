@@ -37,7 +37,6 @@
                                             <th>Pending</th>
                                             <th>Created At</th>
                                             <th>Challenge Code</th>
-                                            <th></th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -71,8 +70,6 @@
                                             <th>Egifter</th>
                                             <th>Pending</th>
                                             <th>Created At</th>
-                                            <th>Challenge Code</th>
-                                            <th></th>
                                         </tr>
                                         </thead>
                                         <tbody>
