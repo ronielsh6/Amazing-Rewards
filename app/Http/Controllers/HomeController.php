@@ -176,12 +176,14 @@ class HomeController extends Controller
         $start = $request->get('start');
         $page = $request->get('length');
         $orderElement = $request->get('order')[0];
+        $active = $request->get('active');
         $orderDir = $orderElement['dir'];
         $column = $request->get('columns')[$orderElement['column']]['data'];
         $giftCardsQuery = GiftCard::with(['getOwner']);
         if (! empty($userId) && $userId !== 0) {
             $giftCardsQuery->where('owner', $userId);
         }
+        $giftCardsQuery->where('pending', $active === 'true' ? 0 : 1);
         $totalRecordsFiltered = $giftCardsQuery->get()->count();
 
         if ($start > 0) {
@@ -228,7 +230,14 @@ class HomeController extends Controller
             ]);
         }
 
-        $eGifterResponse = $this->generateEgifterCard($giftCardItem, $userObj);
+        try {
+            $eGifterResponse = $this->generateEgifterCard($giftCardItem, $userObj);
+        } catch (\Exception $exception) {
+            return response()->json([
+                'code' => 404,
+                'message' => 'It wasn`t possible to enable the gift card. '.$exception->getMessage(),
+            ]);
+        }
 
         if (array_key_exists('previousOrderIds', $eGifterResponse)) {
             return response()->json([

@@ -11,39 +11,75 @@
     <div class="container-fluid py-4">
         <div class="row">
             <div class="col-12">
-                <div class="card my-4">
-                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                        <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
-                            <h6 class="text-white text-capitalize ps-3">Gift Cards table</h6>
-                        </div>
+                <nav>
+                    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                        <a class="nav-link active" id="active-giftcards-tab" data-bs-toggle="tab"
+                           href="#enabled-giftcards" role="tab" aria-controls="nav-home" aria-selected="true">Active
+                            Gift Cards</a>
+                        <a class="nav-link" id="pending-giftcards-tab" data-bs-toggle="tab" href="#pendign-giftcards"
+                           role="tab" aria-controls="nav-profile" aria-selected="false">Pending Gift Cards</a>
                     </div>
-                    <div class="card-body px-0 pb-2">
-                        <div class="row mr-5 ml-5">
-                            <div class="row filters">
-                                <div class="col-2">
-                                    <a class="btn btn-success text-white" style="display: none" id="activateCards">Activate Cards</a>
+                </nav>
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active" id="enabled-giftcards" role="tabpanel"
+                         aria-labelledby="home-tab">
+                        <div class="card my-4">
+                            <div class="card-body px-0 pb-2">
+                                <div class="p-0 col-12">
+                                    <table class="table align-items-center mb-0 w-100" id="active-giftcardsTable">
+                                        <thead>
+                                        <tr>
+                                            <th>Gift Card</th>
+                                            <th>Amount</th>
+                                            <th>Status</th>
+                                            <th>Claim Link</th>
+                                            <th>Egifter</th>
+                                            <th>Pending</th>
+                                            <th>Created At</th>
+                                            <th>Challenge Code</th>
+                                            <th></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
-                        <div class="p-0 col-12">
-                            <table class="table align-items-center mb-0" id="giftcardsTable">
-                                <thead>
-                                <tr>
-{{--                                    <th><input type="checkbox" name="select_all" value="1" id="example-select-all"></th>--}}
-                                    <th>Gift Card</th>
-                                    <th>Amount</th>
-                                    <th>Status</th>
-                                    <th>Claim Link</th>
-                                    <th>Egifter</th>
-                                    <th>Pending</th>
-                                    <th>Created At</th>
-                                    <th>Challenge Code</th>
-                                    <th></th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                </tbody>
-                            </table>
+                    </div>
+                    <div class="tab-pane fade" id="pendign-giftcards" role="tabpanel" aria-labelledby="profile-tab">
+                        <div class="card my-4">
+                            <div class="card-body px-0 pb-2">
+                                <div class="row mr-5 ml-5">
+                                    <div class="row filters">
+                                        <div class="col-2">
+                                            <a class="btn btn-success text-white" style="display: none"
+                                               id="activateCards">Activate Cards</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="p-0 col-12">
+                                    <table class="table align-items-center mb-0 w-100" id="pending-giftcardsTable">
+                                        <thead>
+                                        <tr>
+                                            <th><input type="checkbox" name="select_all" value="1"
+                                                       id="example-select-all"></th>
+                                            <th>Gift Card</th>
+                                            <th>Amount</th>
+                                            <th>Status</th>
+                                            <th>Claim Link</th>
+                                            <th>Egifter</th>
+                                            <th>Pending</th>
+                                            <th>Created At</th>
+                                            <th>Challenge Code</th>
+                                            <th></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\GiftCard;
 use App\Http\Controllers\Controller;
 use App\Mail\BuildMail;
+use App\Models\BlockedLog;
 use App\Models\Device;
 use App\Models\User;
 use Carbon\Carbon;
@@ -19,7 +20,7 @@ use Rap2hpoutre\LaravelLogViewer\LaravelLogViewer;
 
 class AdminController extends Controller
 {
-    private const ALLOWED_COUNTRIES = ['Spain', 'Germany', 'United States'];
+    private const ALLOWED_COUNTRIES = ['Spain', 'Germany', 'United States', 'Canada'];
 
     public function getGiftCards(Request $request)
     {
@@ -91,13 +92,12 @@ class AdminController extends Controller
         if ($user->points >= $request->amount * 1000) {
             $ip = $request->ip();
             $ip_data = @json_decode(file_get_contents('http://www.geoplugin.net/json.gp?ip='.$ip), true, 512, JSON_THROW_ON_ERROR);
-            $denied = false;
 
-            if (! \in_array($ip_data['geoplugin_countryName'], [$request->country, $user->country], true) or ! \in_array($request->country, self::ALLOWED_COUNTRIES, true)) {
-                $user->status = 'blocked';
-                $user->getDevices()->update(['status' => 'blocked']);
-                $user->touch();
-                $user->save();
+            $ipNotAllowed = ! \in_array($ip_data['geoplugin_countryName'], [$request->country, $user->country], true);
+            $countryNotAllowed = ! \in_array($request->country, self::ALLOWED_COUNTRIES, true);
+
+            if ($ipNotAllowed or $countryNotAllowed) {
+                $this->BlockUser($user, $ipNotAllowed, $request);
 
                 return response()->json(
                     ['message' => 'You`re forbidden to use this app'],
@@ -169,10 +169,10 @@ class AdminController extends Controller
         ];
         foreach ($data['logs'] as $datum) {
             if ($datum['level'] === 'info') {
-                if (!empty($datum['text'])) {
+                if (! empty($datum['text'])) {
                     list($email, $action, $points, , $source) = explode(' ', $datum['text']);
                     $date = $datum['date'];
-                    if ($user->email == $email){
+                    if ($user->email == $email) {
                         $result[$count] = [
                             'email' => $email,
                             'points' => $points,
@@ -228,11 +228,11 @@ class AdminController extends Controller
         $ip = $request->ip();
         $ip_data = @json_decode(file_get_contents('http://www.geoplugin.net/json.gp?ip='.$ip), true, 512, JSON_THROW_ON_ERROR);
 
-        if (! \in_array($ip_data['geoplugin_countryName'], [$request->country, $user->country], true) or ! \in_array($request->country, self::ALLOWED_COUNTRIES, true)) {
-            $user->status = 'blocked';
-            $user->getDevices()->update(['status' => 'blocked']);
-            $user->touch();
-            $user->save();
+        $ipNotAllowed = ! \in_array($ip_data['geoplugin_countryName'], [$request->country, $user->country], true);
+        $countryNotAllowed = ! \in_array($request->country, self::ALLOWED_COUNTRIES, true);
+
+        if ($ipNotAllowed or $countryNotAllowed) {
+            $this->BlockUser($user, $ipNotAllowed, $request);
         }
 
         $user->touch();
@@ -429,5 +429,30 @@ class AdminController extends Controller
 
         return response()->json([
             'data' => $user->updated_at, ]);
+    }
+
+    /**
+     * @param $user
+     * @param bool $ipNotAllowed
+     * @param Request $request
+     * @return void
+     */
+    private function BlockUser($user, bool $ipNotAllowed, Request $request): void
+    {
+        $user->status = 'blocked';
+        $user->getDevices()->update(['status' => 'blocked']);
+        $user->touch();
+        $user->save();
+
+        $reason = ! $ipNotAllowed ? 'The ip address no belongs to any authorized country' : 'The country is not in the authorized list';
+
+        $blockedLogs = new BlockedLog([
+            'user_id' => $user->id,
+            'ip_address' => $request->ip(),
+            'country' => $user->country,
+            'reason' => $reason,
+        ]);
+
+        $blockedLogs->save();
     }
 }
