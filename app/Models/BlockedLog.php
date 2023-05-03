@@ -19,6 +19,6 @@ class BlockedLog extends Model
 
     public function getUser()
     {
-        return $this->hasOne(User::class);
+        return $this->belongsTo(User::class);
     }
 }
