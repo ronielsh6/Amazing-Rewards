@@ -13,40 +13,16 @@
             <div class="col-12">
                 <nav>
                     <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                        <a class="nav-link active" id="pending-giftcards-tab" data-bs-toggle="tab" href="#pendign-giftcards"
-                           role="tab" aria-controls="nav-profile" aria-selected="false">Pending Gift Cards</a>
-                        <a class="nav-link" id="active-giftcards-tab" data-bs-toggle="tab"
-                           href="#enabled-giftcards" role="tab" aria-controls="nav-home" aria-selected="true">Active
+                        <a class="nav-link active" id="active-giftcards-tab" data-bs-toggle="tab"
+                           href="#enabled-giftcards" role="tab" aria-controls="nav-home" aria-selected="true">Pending
                             Gift Cards</a>
+                        <a class="nav-link" id="pending-giftcards-tab" data-bs-toggle="tab" href="#pendign-giftcards"
+                           role="tab" aria-controls="nav-profile" aria-selected="false">Active Gift Cards</a>
                     </div>
                 </nav>
                 <div class="tab-content" id="myTabContent">
                     <div class="tab-pane fade show active" id="enabled-giftcards" role="tabpanel"
                          aria-labelledby="home-tab">
-                        <div class="card my-4">
-                            <div class="card-body px-0 pb-2">
-                                <div class="p-0 col-12">
-                                    <table class="table align-items-center mb-0 w-100" id="active-giftcardsTable">
-                                        <thead>
-                                        <tr>
-                                            <th>Gift Card</th>
-                                            <th>Amount</th>
-                                            <th>Status</th>
-                                            <th>Claim Link</th>
-                                            <th>Egifter</th>
-                                            <th>Pending</th>
-                                            <th>Created At</th>
-                                            <th>Challenge Code</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="tab-pane fade" id="pendign-giftcards" role="tabpanel" aria-labelledby="profile-tab">
                         <div class="card my-4">
                             <div class="card-body px-0 pb-2">
                                 <div class="row mr-5 ml-5">
@@ -70,6 +46,30 @@
                                             <th>Egifter</th>
                                             <th>Pending</th>
                                             <th>Created At</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="pendign-giftcards" role="tabpanel" aria-labelledby="profile-tab">
+                        <div class="card my-4">
+                            <div class="card-body px-0 pb-2">
+                                <div class="p-0 col-12">
+                                    <table class="table align-items-center mb-0 w-100" id="active-giftcardsTable">
+                                        <thead>
+                                        <tr>
+                                            <th>Gift Card</th>
+                                            <th>Amount</th>
+                                            <th>Status</th>
+                                            <th>Claim Link</th>
+                                            <th>Egifter</th>
+                                            <th>Pending</th>
+                                            <th>Created At</th>
+                                            <th>Challenge Code</th>
                                         </tr>
                                         </thead>
                                         <tbody>
