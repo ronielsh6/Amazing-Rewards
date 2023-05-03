@@ -12,6 +12,7 @@ class BlockedLog extends Model
     protected $table = 'blocked_logs';
 
     protected $fillable = [
+        'user_id',
         'ip_address',
         'country',
         'reason',

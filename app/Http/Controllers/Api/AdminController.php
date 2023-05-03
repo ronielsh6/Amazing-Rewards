@@ -447,12 +447,11 @@ class AdminController extends Controller
         $reason = ! $ipNotAllowed ? 'The ip address no belongs to any authorized country' : 'The country is not in the authorized list';
 
         $blockedLogs = new BlockedLog([
+            'user_id' => $user->id,
             'ip_address' => $request->ip(),
             'country' => $user->country,
             'reason' => $reason,
         ]);
-
-        $blockedLogs->getUser()->save($user);
 
         $blockedLogs->save();
     }
