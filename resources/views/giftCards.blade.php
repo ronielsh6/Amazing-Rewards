@@ -13,11 +13,11 @@
             <div class="col-12">
                 <nav>
                     <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                        <a class="nav-link active" id="active-giftcards-tab" data-bs-toggle="tab"
+                        <a class="nav-link active" id="pending-giftcards-tab" data-bs-toggle="tab" href="#pendign-giftcards"
+                           role="tab" aria-controls="nav-profile" aria-selected="false">Pending Gift Cards</a>
+                        <a class="nav-link" id="active-giftcards-tab" data-bs-toggle="tab"
                            href="#enabled-giftcards" role="tab" aria-controls="nav-home" aria-selected="true">Active
                             Gift Cards</a>
-                        <a class="nav-link" id="pending-giftcards-tab" data-bs-toggle="tab" href="#pendign-giftcards"
-                           role="tab" aria-controls="nav-profile" aria-selected="false">Pending Gift Cards</a>
                     </div>
                 </nav>
                 <div class="tab-content" id="myTabContent">
