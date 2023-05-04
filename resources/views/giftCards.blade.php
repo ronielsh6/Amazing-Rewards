@@ -46,6 +46,7 @@
                                             <th>Egifter</th>
                                             <th>Pending</th>
                                             <th>Created At</th>
+                                            <th></th>
                                         </tr>
                                         </thead>
                                         <tbody>

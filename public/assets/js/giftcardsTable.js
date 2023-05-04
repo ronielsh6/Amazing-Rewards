@@ -108,7 +108,7 @@ let GiftCardsTable = function() {
                     }
                 },
                 {"className": "dt-center", "targets": "_all"},
-                { 'orderable': false, targets: notOrderColumns }
+                { 'orderable': false, targets: [6, 8] }
             ],
             columns: [
                 { data: 'id'},
@@ -135,7 +135,10 @@ let GiftCardsTable = function() {
                 { data: 'pending', render: function(data, type) {
                         return "<a class='btn btn-warning text-white'><i class='material-icons opacity-10'>cancel</i></a>"
                     } },
-                { data: 'created_at', render: DataTable.render.datetime() }
+                { data: 'created_at', render: DataTable.render.datetime() },
+                { data: 'id', render: function(data, type) {
+                        return "<a class='btn btn-danger text-white'><i class='material-icons opacity-10'>delete</i></a>"
+                    } },
             ],
             filter: false,
             paging: true,
@@ -156,9 +159,18 @@ let GiftCardsTable = function() {
             pendingTable.ajax.reload();
         });
 
+        function deleteCard(data) {
+            enableGiftCard(data, true);
+        }
+
         $('#pending-giftcardsTable tbody').on('click', 'a.btn', function() {
             var data = pendingTable.row( $(this).parents('tr') ).data();
-            enableGiftCard([data]);
+            let $class = this.classList;
+            if (jQuery.inArray('btn-warning', $class) !== -1) {
+                enableGiftCard([data]);
+            } else {
+                deleteCard([data]);
+            }
         });
 
         $('#example-select-all').on('click', function(){
@@ -193,10 +205,15 @@ let GiftCardsTable = function() {
             enableGiftCard(items, true);
         });
 
-        let enableGiftCard = function(data) {
+        let enableGiftCard = function(data, deleteCard = false) {
             let message = 'Are you sure that you want to enable';
             message += data.length > 1 ? ' all these gift cards' : ' a gift card with a value of $'+data[0]['amount']+'?';
             let userIdLocal = this.userId;
+
+            if (deleteCard) {
+                message = 'Are you sure that you want to delete the card? This action is not reversible.';
+            }
+
             swal({
                 title: "Are you sure?",
                 text: message,
@@ -210,7 +227,8 @@ let GiftCardsTable = function() {
                             let postData = {
                                 _token: getCsrfToken(),
                                 card: item['id'],
-                                userId: userIdLocal !== 0 ? userIdLocal :  item['get_owner']['id']
+                                userId: userIdLocal !== 0 ? userIdLocal :  item['get_owner']['id'],
+                                deleteCard: deleteCard
                             };
                             $.post(this.redeemUri, postData, function(data) {
                                 if(data['code'] === 200) {
@@ -223,7 +241,7 @@ let GiftCardsTable = function() {
                                         stack: true,
                                         hideAfter: 10000
                                     });
-                                    datatable.ajax.reload();
+                                    pendingTable.ajax.reload();
                                 } else {
                                     $.toast({
                                         heading: 'Notification',

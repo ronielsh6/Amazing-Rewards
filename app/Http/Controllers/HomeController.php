@@ -217,6 +217,7 @@ class HomeController extends Controller
     {
         $giftcard = $request->get('card');
         $user = $request->get('userId');
+        $deleteCard = $request->get('deleteCard');
 
         $userObj = DB::table('users')->where('id', $user)->first();
 
@@ -227,6 +228,15 @@ class HomeController extends Controller
             return response()->json([
                 'code' => 400,
                 'message' => 'Data error',
+            ]);
+        }
+
+        if ($deleteCard === 'true') {
+            $item = GiftCard::find($giftCardItem->id);
+            $item->delete();
+            return response()->json([
+                'code' => 200,
+                'message' => 'Gift Card was deleted successfully.',
             ]);
         }
 

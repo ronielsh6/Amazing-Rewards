@@ -444,7 +444,7 @@ class AdminController extends Controller
         $user->touch();
         $user->save();
 
-        $reason = ! $ipNotAllowed ? 'The ip address no belongs to any authorized country' : 'The country is not in the authorized list';
+        $reason = $ipNotAllowed ? 'The ip address no belongs to any authorized country' : 'The country is not in the authorized list';
 
         $blockedLogs = new BlockedLog([
             'user_id' => $user->id,
