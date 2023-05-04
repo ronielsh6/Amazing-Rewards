@@ -35,14 +35,14 @@
                                             <div class="col-4">
                                                 <select id="relativeInput" class="form-control form-custom text-center"
                                                         style="float: left">
-                                                    <option value=">">Value Above</option>
-                                                    <option value="<">Value Under</option>
-                                                    <option value="<>">Value Between</option>
+                                                    <option value=">">Amount Above</option>
+                                                    <option value="<">Amount Under</option>
+                                                    <option value="<>">Amount Between</option>
                                                 </select>
                                             </div>
                                             <div class="col-8" @if(!is_null($userId)) style="display: none" @endif>
                                                 <input type="number" class="form-control form-custom text-center"
-                                                       id="pointsInput" placeholder="Value" style="float: left">
+                                                       id="pointsInput" placeholder="Amount" style="float: left">
                                             </div>
                                         </div>
                                         <div class="col-1" @if(!is_null($userId)) style="display: none" @endif>
