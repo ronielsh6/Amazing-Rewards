@@ -27,6 +27,27 @@
                             <div class="card-body px-0 pb-2">
                                 <div class="row mr-5 ml-5">
                                     <div class="row filters">
+                                        <div class="col-2" @if(!is_null($userId)) style="display: none" @endif>
+                                            <input type="text" class="form-control form-custom text-center" id="usernameInput"
+                                                   placeholder="Email">
+                                        </div>
+                                        <div class="row col-4" @if(!is_null($userId)) style="display: none" @endif>
+                                            <div class="col-4">
+                                                <select id="relativeInput" class="form-control form-custom text-center"
+                                                        style="float: left">
+                                                    <option value=">">Value Above</option>
+                                                    <option value="<">Value Under</option>
+                                                    <option value="<>">Value Between</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-8" @if(!is_null($userId)) style="display: none" @endif>
+                                                <input type="number" class="form-control form-custom text-center"
+                                                       id="pointsInput" placeholder="Value" style="float: left">
+                                            </div>
+                                        </div>
+                                        <div class="col-1" @if(!is_null($userId)) style="display: none" @endif>
+                                            <a class="btn btn-primary text-white" id="filterData">Filter</a>
+                                        </div>
                                         <div class="col-2">
                                             <a class="btn btn-success text-white" style="display: none"
                                                id="activateCards">Activate Cards</a>

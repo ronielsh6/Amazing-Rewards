@@ -99,6 +99,9 @@ let GiftCardsTable = function() {
                 data: function(d){
                     d.userId = this.userId;
                     d.active = false;
+                    d.username = $('#usernameInput').val();
+                    d.relative = $('#relativeInput').val();
+                    d.points = $('#pointsInput').val();
                 }
 
             },
@@ -148,6 +151,10 @@ let GiftCardsTable = function() {
             ordering: true,
             lengthMenu: [[50, 100, 200, -1], [50, 100, 200, 'ALL']],
             DisplayLenght: 50,
+        });
+
+        $('#filterData').on('click', function() {
+            pendingTable.ajax.reload();
         });
 
 

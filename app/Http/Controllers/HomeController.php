@@ -177,12 +177,33 @@ class HomeController extends Controller
         $page = $request->get('length');
         $orderElement = $request->get('order')[0];
         $active = $request->get('active');
+        $username = $request->get('username');
+        $relative = $request->get('relative');
+        $points = $request->get('points');
         $orderDir = $orderElement['dir'];
         $column = $request->get('columns')[$orderElement['column']]['data'];
         $giftCardsQuery = GiftCard::with(['getOwner']);
         if (! empty($userId) && $userId !== 0) {
             $giftCardsQuery->where('owner', $userId);
         }
+
+        if (! empty($username)) {
+            $giftCardsQuery->whereHas('getOwner', function ($query) use ($username) {
+                $query->where('email', 'like', '%'.$username.'%');
+            });
+        }
+
+        if (! empty($points)) {
+            $between = \explode(',', $points);
+            if (\count($between) > 1) {
+                $giftCardsQuery->whereBetween('amount', $between);
+            }
+
+            if (\count($between) === 1) {
+                $giftCardsQuery->where('amount', $relative, $points);
+            }
+        }
+
         $giftCardsQuery->where('pending', $active === 'true' ? 0 : 1);
         $totalRecordsFiltered = $giftCardsQuery->get()->count();
 
