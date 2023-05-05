@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\GiftCard;
+use App\Models\BlockedLog;
 use App\Models\Device;
 use App\Models\User;
 use App\Services\CloudMessages;
@@ -54,12 +55,10 @@ class HomeController extends Controller
         $orderElement = $request->get('order')[0];
         $orderDir = $orderElement['dir'];
         $column = $request->get('columns')[$orderElement['column']]['data'];
-        $usersQuery = DB::table('users')->where('status', '=', 'active');
+        $usersQuery = User::where('status', '=', 'active');
 
         if (! empty($username)) {
-            $usersQuery->where(function ($query) use ($username) {
-                $query->where('email', 'like', '%'.$username.'%');
-            });
+            $usersQuery->where('email', 'like', '%'.$username.'%');
         }
 
         if (! empty($points)) {
@@ -72,20 +71,7 @@ class HomeController extends Controller
                 $usersQuery->where('points', $relative, $points);
             }
         }
-        $usersQuery->orderBy($column, $orderDir);
-        $totalRecordsFiltered = $usersQuery->get()->count();
-        if ($start > 0) {
-            $offset = ($start / $page);
-            $usersQuery->offset($offset * $page);
-        }
-        $usersQuery->limit($page);
-        $users = $usersQuery->get()->toArray();
-
-        return response()->json([
-            'data' => $users,
-            'recordsTotal' => $totalRecordsFiltered,
-            'recordsFiltered' => $totalRecordsFiltered,
-        ]);
+        return $this->extracted($usersQuery, $column, $orderDir, $start, $page);
     }
 
     public function blockedUsers(Request $request)
@@ -98,12 +84,10 @@ class HomeController extends Controller
         $orderElement = $request->get('order')[0];
         $orderDir = $orderElement['dir'];
         $column = $request->get('columns')[$orderElement['column']]['data'];
-        $usersQuery = DB::table('users')->where('status', '=', 'blocked');
+        $usersQuery = User::where('status', '=', 'blocked');
 
         if (! empty($username)) {
-            $usersQuery->where(function ($query) use ($username) {
-                $query->where('email', 'like', '%'.$username.'%');
-            });
+            $usersQuery->where('email', 'like', '%'.$username.'%');
         }
 
         if (! empty($points)) {
@@ -116,20 +100,7 @@ class HomeController extends Controller
                 $usersQuery->where('points', $relative, $points);
             }
         }
-        $usersQuery->orderBy($column, $orderDir);
-        $totalRecordsFiltered = $usersQuery->get()->count();
-        if ($start > 0) {
-            $offset = ($start / $page);
-            $usersQuery->offset($offset * $page);
-        }
-        $usersQuery->limit($page);
-        $users = $usersQuery->get()->toArray();
-
-        return response()->json([
-            'data' => $users,
-            'recordsTotal' => $totalRecordsFiltered,
-            'recordsFiltered' => $totalRecordsFiltered,
-        ]);
+        return $this->extracted($usersQuery, $column, $orderDir, $start, $page);
     }
 
     public function deleteUsers(Request $request)
@@ -350,5 +321,55 @@ class HomeController extends Controller
             ]);
 
         return $response->json();
+    }
+
+    public function getBlockedLogs(Request $request) {
+
+        return view('blockedLogs');
+    }
+
+    public function getBlockedLogsList(Request $request)
+    {
+        $start = $request->get('start');
+        $page = $request->get('length');
+        $username = $request->get('username');
+        $orderElement = $request->get('order')[0];
+        $orderDir = $orderElement['dir'];
+        $column = $request->get('columns')[$orderElement['column']]['data'];
+        $blockedLogsQuery = BlockedLog::with('getUser');
+
+        if (! empty($username)) {
+            $blockedLogsQuery->whereHas('getUser', function ($query) use ($username) {
+                $query->where('email', 'like', '%'.$username.'%');
+            });
+        }
+
+        return $this->extracted($blockedLogsQuery, 'created_at', $orderDir, $start, $page);
+    }
+
+    /**
+     * @param \Illuminate\Database\Eloquent\Builder $blockedLogsQuery
+     * @param mixed $column
+     * @param mixed $orderDir
+     * @param mixed $start
+     * @param mixed $page
+     * @return \Illuminate\Http\JsonResponse
+     */
+    private function extracted(\Illuminate\Database\Eloquent\Builder $blockedLogsQuery, mixed $column, mixed $orderDir, mixed $start, mixed $page): \Illuminate\Http\JsonResponse
+    {
+        $blockedLogsQuery->orderBy($column, $orderDir);
+        $totalRecordsFiltered = $blockedLogsQuery->get()->count();
+        if ($start > 0) {
+            $offset = ($start / $page);
+            $blockedLogsQuery->offset($offset * $page);
+        }
+        $blockedLogsQuery->limit($page);
+        $users = $blockedLogsQuery->get()->toArray();
+
+        return response()->json([
+            'data' => $users,
+            'recordsTotal' => $totalRecordsFiltered,
+            'recordsFiltered' => $totalRecordsFiltered,
+        ]);
     }
 }

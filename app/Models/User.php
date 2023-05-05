@@ -95,4 +95,8 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Device::class, 'user_device', 'user_id', 'device_id');
     }
+
+    public function getLogs() {
+        return $this->hasMany(BlockedLog::class);
+    }
 }
