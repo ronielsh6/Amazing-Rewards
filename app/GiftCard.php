@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Models\GiftcardLog;
 use Illuminate\Database\Eloquent\Model;
 
 class GiftCard extends Model
@@ -25,5 +26,10 @@ class GiftCard extends Model
     public function getOwner()
     {
         return $this->hasOne(User::class, 'id', 'owner');
+    }
+
+    public function getLogs()
+    {
+        return $this->hasMany(GiftcardLog::class);
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\GiftCard;
 use App\Models\BlockedLog;
 use App\Models\Device;
+use App\Models\GiftcardLog;
 use App\Models\User;
 use App\Services\CloudMessages;
 use Google\CRC32\Table;
@@ -71,6 +72,7 @@ class HomeController extends Controller
                 $usersQuery->where('points', $relative, $points);
             }
         }
+
         return $this->extracted($usersQuery, $column, $orderDir, $start, $page);
     }
 
@@ -100,6 +102,7 @@ class HomeController extends Controller
                 $usersQuery->where('points', $relative, $points);
             }
         }
+
         return $this->extracted($usersQuery, $column, $orderDir, $start, $page);
     }
 
@@ -194,6 +197,44 @@ class HomeController extends Controller
         ]);
     }
 
+    public function getGiftCardsLogs(Request $request)
+    {
+        $start = $request->get('start');
+        $page = $request->get('length');
+        $orderElement = $request->get('order')[0];
+        $username = $request->get('username');
+        $orderDir = $orderElement['dir'];
+        $column = $request->get('columns')[$orderElement['column']]['data'];
+        $giftCardsLogsQuery = GiftcardLog::with(['getGiftcard', 'getGiftcard.getOwner']);
+
+        if (! empty($username)) {
+            $giftCardsLogsQuery->whereHas('getGiftcard', function ($query) use ($username) {
+                $query->whereHas('getOwner', function ($subquery) use ($username) {
+                    $subquery->where('email', 'like', '%'.$username.'%');
+                });
+
+                $query->where('pending', true);
+            });
+        }
+
+        $totalRecordsFiltered = $giftCardsLogsQuery->get()->count();
+
+        if ($start > 0) {
+            $offset = ($start / $page);
+            $giftCardsLogsQuery->offset($offset * $page);
+        }
+
+        $giftCardsLogsQuery->orderBy($column, $orderDir);
+        $giftCardsLogsQuery->limit($page);
+        $giftcards = $giftCardsLogsQuery->get()->toArray();
+
+        return response()->json([
+            'data' => $giftcards,
+            'recordsTotal' => $totalRecordsFiltered,
+            'recordsFiltered' => $totalRecordsFiltered,
+        ]);
+    }
+
     private function getAuthToken()
     {
         $response = Http::withHeaders([
@@ -213,7 +254,7 @@ class HomeController extends Controller
 
         $userObj = DB::table('users')->where('id', $user)->first();
 
-        $giftCardItem = DB::table('gift_card')->where('id', $giftcard)
+        $giftCardItem = GiftCard::where('id', $giftcard)
             ->where('owner', $user)->first();
 
         if (! $giftCardItem) {
@@ -224,8 +265,8 @@ class HomeController extends Controller
         }
 
         if ($deleteCard === 'true') {
-            $item = GiftCard::find($giftCardItem->id);
-            $item->delete();
+            $giftCardItem->delete();
+
             return response()->json([
                 'code' => 200,
                 'message' => 'Gift Card was deleted successfully.',
@@ -235,6 +276,12 @@ class HomeController extends Controller
         try {
             $eGifterResponse = $this->generateEgifterCard($giftCardItem, $userObj);
         } catch (\Exception $exception) {
+            $giftcardLog = new GiftcardLog([
+                'reason' => $exception->getMessage(),
+            ]);
+
+            $giftCardItem->getLogs()->save($giftcardLog);
+
             return response()->json([
                 'code' => 404,
                 'message' => 'It wasn`t possible to enable the gift card. '.$exception->getMessage(),
@@ -242,6 +289,12 @@ class HomeController extends Controller
         }
 
         if (array_key_exists('previousOrderIds', $eGifterResponse)) {
+            $giftcardLog = new GiftcardLog([
+                'reason' => 'Gift Card Id Already exist in eGifter.',
+            ]);
+
+            $giftCardItem->getLogs()->save($giftcardLog);
+
             return response()->json([
                 'code' => 400,
                 'message' => 'Gift Card Id Already exist in eGifter.',
@@ -323,8 +376,8 @@ class HomeController extends Controller
         return $response->json();
     }
 
-    public function getBlockedLogs(Request $request) {
-
+    public function getBlockedLogs(Request $request)
+    {
         return view('blockedLogs');
     }
 

@@ -18,6 +18,8 @@
                             Gift Cards</a>
                         <a class="nav-link" id="pending-giftcards-tab" data-bs-toggle="tab" href="#pendign-giftcards"
                            role="tab" aria-controls="nav-profile" aria-selected="false">Active Gift Cards</a>
+                        <a class="nav-link" id="logs-giftcards-tab" data-bs-toggle="tab" href="#logs-giftcards"
+                           role="tab" aria-controls="nav-logs" aria-selected="false">Gift Cards Logs</a>
                     </div>
                 </nav>
                 <div class="tab-content" id="myTabContent">
@@ -101,6 +103,37 @@
                             </div>
                         </div>
                     </div>
+                    <div class="tab-pane fade" id="logs-giftcards" role="tabpanel" aria-labelledby="profile-tab">
+                        <div class="card my-4">
+                            <div class="card-body px-0 pb-2">
+                                <div class="row mr-5 ml-5">
+                                    <div class="row filters">
+                                        <div class="col-2">
+                                            <input type="text" class="form-control form-custom text-center" id="usernameLogsInput"
+                                                   placeholder="Email">
+                                        </div>
+                                        <div class="col-1">
+                                            <a class="btn btn-primary text-white" id="filterDataLogs">Filter</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="p-0 col-12">
+                                    <table class="table align-items-center mb-0 w-100" id="logs-giftcardsTable">
+                                        <thead>
+                                        <tr>
+                                            <th>Owner</th>
+                                            <th>Amount</th>
+                                            <th>Reason of failure</th>
+                                            <th>Date and time</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -134,6 +167,7 @@
     <script>
         GiftCardsTable.setUri('{{ route('getGiftCards') }}');
         GiftCardsTable.setRedeemUri('{{ route('enableGiftcard') }}');
+        GiftCardsTable.setLogsUri('{{ route('getGiftCardsLogs') }}');
         GiftCardsTable.setUserId({{ $userId ?? 0}}, "{{ asset('assets/img/giftcard.png') }}");
         GiftCardsTable.init();
     </script>

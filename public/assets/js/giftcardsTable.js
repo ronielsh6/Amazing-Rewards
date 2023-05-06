@@ -3,9 +3,14 @@ let GiftCardsTable = function() {
     let redeemUri = '';
     let userId = '';
     let giftCardImage = '';
+    let logsUri = '';
 
     let setUri = function(dataUri) {
         this.dataUri =dataUri;
+    };
+
+    let setLogsUri = function(logsUri) {
+        this.logsUri =logsUri;
     };
 
     let setUserId = function(userId, giftCardImage) {
@@ -153,8 +158,56 @@ let GiftCardsTable = function() {
             DisplayLenght: 50,
         });
 
+        let logsTable =$('#logs-giftcardsTable').DataTable({
+            language: {
+                processing: "Loading data ...",
+                emptyTable: "There are no records to show",
+                paginate: {
+                    previous: "<",
+                    next: ">",
+                    first: "<<",
+                    last: ">>"
+                }
+            },
+            ajax: {
+                url: this.logsUri,
+                data: function(d){
+                    d.username = $('#usernameLogsInput').val();
+                }
+
+            },
+            columnDefs: [
+                {"className": "dt-center", "targets": "_all"},
+                { 'orderable': false, targets: [0] }
+            ],
+            columns: [
+                { data: 'get_giftcard', render: function(data, type) {
+                    return data['get_owner']['email'];
+                    } },
+                { data: 'get_giftcard', render: function (data, type) {
+                    return $.fn.dataTable.render
+                        .number( '.', ',', 0, '$')
+                            .display(data['amount']);
+                    } },
+                { data: 'reason'},
+                { data: 'created_at', render: DataTable.render.datetime() },
+            ],
+            filter: false,
+            paging: true,
+            processing: true,
+            serverSide: true,
+            order: [[2, 'asc']],
+            ordering: true,
+            lengthMenu: [[50, 100, 200, -1], [50, 100, 200, 'ALL']],
+            DisplayLenght: 50,
+        });
+
         $('#filterData').on('click', function() {
             pendingTable.ajax.reload();
+        });
+
+        $('#filterDataLogs').on('click', function() {
+            logsTable.ajax.reload();
         });
 
 
@@ -164,6 +217,10 @@ let GiftCardsTable = function() {
 
         $('#pending-giftcards-tab').on('click', function (e) {
             pendingTable.ajax.reload();
+        });
+
+        $('#logs-giftcards-tab').on('click', function (e) {
+            logsTable.ajax.reload();
         });
 
         function deleteCard(data) {
@@ -280,6 +337,9 @@ let GiftCardsTable = function() {
         },
         setRedeemUri: function(redeemUri) {
             setRedeemUri(redeemUri);
+        },
+        setLogsUri: function (logsUri) {
+            setLogsUri(logsUri);
         }
     }
 }();

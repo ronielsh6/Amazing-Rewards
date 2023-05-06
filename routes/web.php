@@ -32,6 +32,7 @@ Route::post('/user/delete', [App\Http\Controllers\HomeController::class, 'delete
 
 Route::get('/user/giftcards', [App\Http\Controllers\HomeController::class, 'getUserGiftCards'])->name('showGiftCards');
 Route::get('/giftcards', [App\Http\Controllers\HomeController::class, 'getGiftCards'])->name('getGiftCards');
+Route::get('/giftcards-logs', [App\Http\Controllers\HomeController::class, 'getGiftCardsLogs'])->name('getGiftCardsLogs');
 Route::post('/giftcards/enable', [App\Http\Controllers\HomeController::class, 'getEnabledGiftCard'])->name('enableGiftcard');
 Route::post('/send-messages', [App\Http\Controllers\HomeController::class, 'sendMessages'])->name('sendMessages');
 
