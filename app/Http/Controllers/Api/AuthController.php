@@ -24,13 +24,15 @@ class AuthController extends Controller
             return response(['errors'=>$validator->errors()->all()], 422);
         }
         $request['password'] = Hash::make($request['password']);
-        $device = Device::where('device_id', $request->device_id)->where('status', 'blocked')->get();
-        if ($device->count() > 0) {
-            return response()->json(
-                ['message' => 'deviceIdValidationForbidden'],
-                409
-            );
-        }
+
+//      TODO: This is query blocking users
+//        $device = Device::where('device_id', $request->device_id)->where('status', 'blocked')->get();
+//        if ($device->count() > 0) {
+//            return response()->json(
+//                ['message' => 'deviceIdValidationForbidden'],
+//                409
+//            );
+//        }
         $existDevice = Device::where('device_id', $request->device_id)->first();
         $user = User::create($request->toArray());
 
@@ -91,13 +93,15 @@ class AuthController extends Controller
             return response()->json(['errors'=>$validator->errors()->all()], 422);
         }
 
-        $device = Device::where('device_id', $request->device_id)->where('status', 'blocked')->get();
-        if ($device->count() > 0) {
-            return response()->json(
-                ['message' => 'deviceIdValidationForbidden'],
-                409
-            );
-        }
+//        TODO: This is query blocking users
+//        $device = Device::where('device_id', $request->device_id)->where('status', 'blocked')->get();
+//        if ($device->count() > 0) {
+//            return response()->json(
+//                ['message' => 'deviceIdValidationForbidden'],
+//                409
+//            );
+//        }
+
         $user = User::where('email', $request->email)->first();
         if ($user) {
             if ($user->status === 'blocked') {
@@ -145,11 +149,11 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if ($user) {
-            if ($user->status === 'blocked') {
-                return response()->json([
-                    'message'=> 'userForbidden',
-                ], 403);
-            }
+//            if ($user->status === 'blocked') {
+//                return response()->json([
+//                    'message'=> 'userForbidden',
+//                ], 403);
+//            }
 
             $device_id = $request->device_id;
             $existDevice = Device::where('device.device_id', $device_id)->first();
