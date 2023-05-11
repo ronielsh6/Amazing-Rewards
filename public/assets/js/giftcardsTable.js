@@ -266,7 +266,7 @@ let GiftCardsTable = function() {
                 let data = pendingTable.row($(obj).parents('tr')).data();
                 items.push(data);
             });
-            enableGiftCard(items, true);
+            enableGiftCard(items);
         });
 
         let enableGiftCard = function(data, deleteCard = false) {
