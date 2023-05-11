@@ -90,20 +90,20 @@ class AdminController extends Controller
         $request['owner'] = $request->user()->id;
         $user = User::find($request->user()->id);
         if ($user->points >= $request->amount * 1000) {
-//            $ip = $request->ip();
-//            $ip_data = @json_decode(file_get_contents('http://www.geoplugin.net/json.gp?ip='.$ip), true, 512, JSON_THROW_ON_ERROR);
-//
-//            $ipNotAllowed = ! \in_array($ip_data['geoplugin_countryName'], [$request->country, $user->country], true);
-//            $countryNotAllowed = ! \in_array($request->country, self::ALLOWED_COUNTRIES, true);
-//
-//            if ($ipNotAllowed or $countryNotAllowed) {
-//                $this->BlockUser($user, $ipNotAllowed, $request);
+            $ip = $request->ip();
+            $ip_data = @json_decode(file_get_contents('http://www.geoplugin.net/json.gp?ip='.$ip), true, 512, JSON_THROW_ON_ERROR);
+
+            $ipNotAllowed = ! \in_array($ip_data['geoplugin_countryName'], [$request->country, $user->country], true);
+            $countryNotAllowed = ! \in_array($request->country, self::ALLOWED_COUNTRIES, true);
+
+            if ($ipNotAllowed or $countryNotAllowed) {
+                $this->BlockUser($user, $ipNotAllowed, $request);
 //
 //                return response()->json(
 //                    ['message' => 'You`re forbidden to use this app'],
 //                    409
 //                );
-//            }
+            }
 
             GiftCard::create($request->toArray());
             $user->points -= $request->amount * 1000;
@@ -209,34 +209,34 @@ class AdminController extends Controller
             $user->app_version = $request->app_version;
         }
 
-//        if ($request->device_id !== null) {
-//            $device = $user->getDevices()->where('device.device_id', $request->device_id)->get()->count();
-//            if ($device < 1) {
-//                $newDevice = new Device([
-//                    'device_id' => $request->device_id,
-//                    'status' => 'active',
-//                ]);
-//                $newDevice->save();
-//                $user->getDevices()->attach($newDevice);
-//            }
-//        }
+        if ($request->device_id !== null) {
+            $device = $user->getDevices()->where('device.device_id', $request->device_id)->get()->count();
+            if ($device < 1) {
+                $newDevice = new Device([
+                    'device_id' => $request->device_id,
+                    'status' => 'active',
+                ]);
+                $newDevice->save();
+                $user->getDevices()->attach($newDevice);
+            }
+        }
+
+        if ($request->country !== null and $user->country === null) {
+            $user->country = $request->country;
+        }
+
+        $ip = $request->ip();
+        $ip_data = @json_decode(file_get_contents('http://www.geoplugin.net/json.gp?ip='.$ip), true, 512, JSON_THROW_ON_ERROR);
+
+        $ipNotAllowed = ! \in_array($ip_data['geoplugin_countryName'], [$request->country, $user->country], true);
+        $countryNotAllowed = ! \in_array($request->country, self::ALLOWED_COUNTRIES, true);
+
+        if ($ipNotAllowed or $countryNotAllowed) {
+            $this->BlockUser($user, $ipNotAllowed, $request);
+        }
 //
-//        if ($request->country !== null and $user->country === null) {
-//            $user->country = $request->country;
-//        }
-//
-//        $ip = $request->ip();
-//        $ip_data = @json_decode(file_get_contents('http://www.geoplugin.net/json.gp?ip='.$ip), true, 512, JSON_THROW_ON_ERROR);
-//
-//        $ipNotAllowed = ! \in_array($ip_data['geoplugin_countryName'], [$request->country, $user->country], true);
-//        $countryNotAllowed = ! \in_array($request->country, self::ALLOWED_COUNTRIES, true);
-//
-//        if ($ipNotAllowed or $countryNotAllowed) {
-//            $this->BlockUser($user, $ipNotAllowed, $request);
-//        }
-//
-//        $user->touch();
-//        $user->save();
+        $user->touch();
+        $user->save();
 
         return response()->json([
             'data' => $user->updated_at, ]);
@@ -439,16 +439,16 @@ class AdminController extends Controller
      */
     private function BlockUser($user, bool $ipNotAllowed, Request $request): void
     {
-        $user->status = 'blocked';
-        $user->getDevices()->update(['status' => 'blocked']);
-        $user->touch();
-        $user->save();
+//        $user->status = 'blocked';
+//        $user->getDevices()->update(['status' => 'blocked']);
+//        $user->touch();
+//        $user->save();
 
         $reason = $ipNotAllowed ? 'The ip address no belongs to any authorized country' : 'The country is not in the authorized list';
 
         $blockedLogs = new BlockedLog([
             'ip_address' => $request->ip(),
-            'country' => $user->country,
+            'country' => $request->country,
             'reason' => $reason,
         ]);
 
