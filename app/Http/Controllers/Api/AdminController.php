@@ -20,7 +20,7 @@ use Rap2hpoutre\LaravelLogViewer\LaravelLogViewer;
 
 class AdminController extends Controller
 {
-    private const ALLOWED_COUNTRIES = ['Spain', 'Germany', 'United States', 'Canada'];
+    private const ALLOWED_COUNTRIES = ['Spain', 'Germany', 'United States', 'Canada', 'Puerto Rico'];
 
     public function getGiftCards(Request $request)
     {
