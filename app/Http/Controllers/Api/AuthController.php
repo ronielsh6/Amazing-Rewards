@@ -122,7 +122,7 @@ class AuthController extends Controller
             $response = ['token' => $token];
         }
 
-        $deviceExist = Device::where('device.device_id', $request->device_id)->first();
+        $deviceExist = Device::where('device_id', $request->device_id)->first();
         if (! $deviceExist) {
             $device_id = $request->device_id;
             $device = new Device([
@@ -157,7 +157,14 @@ class AuthController extends Controller
             }
 
             $device_id = $request->device_id;
-            $existDevice = Device::where('device.device_id', $device_id)->first();
+
+            if (Device::where('device_id', $device_id)->where('status', 'blocked')->count() > 0) {
+                return response()->json([
+                    'message'=> 'deviceIdValidationError',
+                ], 403);
+            }
+
+            $existDevice = Device::where('device_id', $device_id)->first();
 
             if (! $existDevice) {
                 $device = new Device([
