@@ -26,13 +26,13 @@ class AuthController extends Controller
         $request['password'] = Hash::make($request['password']);
 
 //      TODO: This is query blocking users
-        $device = Device::where('device_id', $request->device_id)->where('status', 'blocked')->get();
-        if ($device->count() > 0) {
-            return response()->json(
-                ['message' => 'deviceIdValidationForbidden'],
-                409
-            );
-        }
+//        $device = Device::where('device_id', $request->device_id)->where('status', 'blocked')->get();
+//        if ($device->count() > 0) {
+//            return response()->json(
+//                ['message' => 'deviceIdValidationForbidden'],
+//                409
+//            );
+//        }
 
         $existDevice = Device::where('device_id', $request->device_id)->first();
         $user = User::create($request->toArray());
@@ -95,13 +95,13 @@ class AuthController extends Controller
         }
 
 //        TODO: This is query blocking users
-        $device = Device::where('device_id', $request->device_id)->where('status', 'blocked')->get();
-        if ($device->count() > 0) {
-            return response()->json(
-                ['message' => 'deviceIdValidationForbidden'],
-                409
-            );
-        }
+//        $device = Device::where('device_id', $request->device_id)->where('status', 'blocked')->get();
+//        if ($device->count() > 0) {
+//            return response()->json(
+//                ['message' => 'deviceIdValidationForbidden'],
+//                409
+//            );
+//        }
 
         $user = User::where('email', $request->email)->first();
         if ($user) {
@@ -117,7 +117,6 @@ class AuthController extends Controller
         } else {
             $request['password'] = Hash::make($request['password']);
             $user = User::create($request->toArray());
-            $user->getDevices()->attach($device);
             $token = $user->createToken('Laravel Password Grant Client')->accessToken;
             $response = ['token' => $token];
         }
@@ -158,11 +157,11 @@ class AuthController extends Controller
 
             $device_id = $request->device_id;
 
-            if (Device::where('device_id', $device_id)->where('status', 'blocked')->count() > 0) {
-                return response()->json([
-                    'message'=> 'deviceIdValidationError',
-                ], 403);
-            }
+//            if (Device::where('device_id', $device_id)->where('status', 'blocked')->count() > 0) {
+//                return response()->json([
+//                    'message'=> 'deviceIdValidationError',
+//                ], 403);
+//            }
 
             $existDevice = Device::where('device_id', $device_id)->first();
 
