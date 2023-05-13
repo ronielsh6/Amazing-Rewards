@@ -413,7 +413,7 @@ class AdminController extends Controller
             $user->save();
 
             return response()->json([
-                'message' => 'Your email was verified successful.', ], 200);
+                'message' => 'emailVerified', ], 200);
         }
 
         return response()->json([
