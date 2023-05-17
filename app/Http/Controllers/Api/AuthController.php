@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Controller;
 use App\Models\Device;
 use App\Models\User;
@@ -213,5 +214,10 @@ class AuthController extends Controller
         }
 
         return response()->json($request->user());
+    }
+
+    public function forgot(Request $request, ForgotPasswordController $forgotPasswordController)
+    {
+        $forgotPasswordController->sendResetLinkEmail($request);
     }
 }

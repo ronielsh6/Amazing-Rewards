@@ -41,3 +41,7 @@ Route::group(['middleware' => 'auth:api', 'namespace'], function () {
     Route::post('user/updateLockScreenPermission', 'App\Http\Controllers\Api\AdminController@updateLockScreenPermission');
     Route::get('user/points-logs', 'App\Http\Controllers\Api\AdminController@getPointsLogs');
 });
+
+Route::group(['middleware' => 'guest:api', 'namespace'], function () {
+    Route::post('forgot', 'App\Http\Controllers\Api\AuthController@forgot');
+});
