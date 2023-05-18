@@ -333,7 +333,7 @@ class HomeController extends Controller
         $errors = false;
         foreach ($ids as $id) {
             $user = User::find($id);
-            $response = (new CloudMessages())->sendMessage($title, $body, $user, ['deep_link' => $deepLink]);
+            $response = (new CloudMessages())->sendMessage($title, $body, $user, ['deep_link' => $deepLink], true);
             if (! $response) {
                 $errors = true;
             }

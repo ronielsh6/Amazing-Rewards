@@ -57,6 +57,7 @@
                                     <th>Email</th>
                                     <th>Points</th>
                                     <th>Age</th>
+                                    <th>App Version</th>
                                     <th>Last connection at</th>
                                     <th></th>
                                 </tr>

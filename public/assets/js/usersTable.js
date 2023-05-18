@@ -47,6 +47,7 @@ let UsersTable = function() {
                     let createdAtDate = moment(data);
                     return (currentDate.diff(createdAtDate, 'days'))+ ' days';
                     } },
+                { data: 'app_version' },
                 { data: 'updated_at' },
                 { data: 'id', render: function() {
                     return "<a class='btn btn-success text-white'><i class='material-icons opacity-10'>send</i></a><a class='btn btn-warning text-white'><i class='material-icons opacity-10'>redeem</i></a><a class='btn btn-danger text-white'><i class='material-icons opacity-10'>block</i></a>"
@@ -107,12 +108,13 @@ let UsersTable = function() {
             let title = $('#messageTitle').val();
             let deepLink = $('#deep_link').val();
             let body = $('#messageBody').val();
-            let data = datatable.rows().data();
             let $customId = parseInt($('#customId').val());
             let ids = [];
             if ($customId === 0 ) {
-                ids = jQuery.map(data, function (item) {
-                    return item['id'];
+                let checked = $('#usersTable tbody input[type="checkbox"]:checked');
+                checked.each(function (id, obj) {
+                    let data = datatable.row($(obj).parents('tr')).data();
+                    ids.push(data['id']);
                 });
             } else {
                 ids = [$customId];
