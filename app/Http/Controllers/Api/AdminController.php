@@ -27,7 +27,7 @@ class AdminController extends Controller
         $giftCards = $request->user()->getGiftCards()->get();
 
         return response()->json([
-            'data' => $giftCards, ]);
+            'data' => $giftCards,]);
     }
 
     private function getAuthToken()
@@ -36,7 +36,7 @@ class AdminController extends Controller
             'AccessToken' => env('EGITFTER_ACCESS_TOKEN'),
             //            'AccessToken' => 'b9wh1nc1br1nt9nc9r69k16br9t2d710l9t11v1981nt989l16nd2v0nd0nh9r0j', PROD
             'Email' => 'info@myamazingrewards.com',
-        ])->post(env('EGITFTER_URL').'/v1/Tokens');
+        ])->post(env('EGITFTER_URL') . '/v1/Tokens');
 
         return $response->json('value');
     }
@@ -91,10 +91,10 @@ class AdminController extends Controller
         $user = User::find($request->user()->id);
         if ($user->points >= $request->amount * 1000) {
             $ip = $request->ip();
-            $ip_data = @json_decode(file_get_contents('http://www.geoplugin.net/json.gp?ip='.$ip), true, 512, JSON_THROW_ON_ERROR);
+            $ip_data = @json_decode(file_get_contents('http://www.geoplugin.net/json.gp?ip=' . $ip), true, 512, JSON_THROW_ON_ERROR);
 
-            $ipNotAllowed = ! \in_array($ip_data['geoplugin_countryName'], [$request->country, $user->country], true);
-            $countryNotAllowed = ! \in_array($request->country, self::ALLOWED_COUNTRIES, true);
+            $ipNotAllowed = !\in_array($ip_data['geoplugin_countryName'], [$request->country, $user->country], true);
+            $countryNotAllowed = !\in_array($request->country, self::ALLOWED_COUNTRIES, true);
 
             if ($ipNotAllowed or $countryNotAllowed) {
                 $this->BlockUser($user, $ipNotAllowed, $request);
@@ -108,20 +108,20 @@ class AdminController extends Controller
             GiftCard::create($request->toArray());
             $user->points -= $request->amount * 1000;
             $user->save();
-            if (! empty($user->referred_by) && User::find($user->referred_by)->exists()) {
+            if (!empty($user->referred_by) && User::find($user->referred_by)->exists()) {
                 $userReferrer = User::find($user->referred_by);
                 $userReferrer->points = $userReferrer->points + 500;
                 $user->points = $user->points + 500;
                 $user->referred_by = null;
                 $userReferrer->save();
                 $user->save();
-                Log::info($user->email.' earned 500 points referred by '.$userReferrer->email);
-                Log::info($userReferrer->email.' earned 500 points for referring '.$user->email);
+                Log::info($user->email . ' earned 500 points referred by ' . $userReferrer->email);
+                Log::info($userReferrer->email . ' earned 500 points for referring ' . $user->email);
             }
             $giftCards = $request->user()->getGiftCards()->get();
 
             return response()->json([
-                'data' => $giftCards, ]);
+                'data' => $giftCards,]);
         }
 
         return response()->json(
@@ -137,7 +137,7 @@ class AdminController extends Controller
         $user = User::find($request->user()->id);
         $user->points += $request->points;
         $user->save();
-        Log::info($user->email.' earned '.$request->points);
+        Log::info($user->email . ' earned ' . $request->points);
 
         return response()->json($user);
     }
@@ -151,7 +151,7 @@ class AdminController extends Controller
             $user->save();
 
             return response()->json([
-                'data' => $user->referral_code, ]);
+                'data' => $user->referral_code,]);
         }
         $user->points += $request->points;
 
@@ -169,7 +169,7 @@ class AdminController extends Controller
         ];
         foreach ($data['logs'] as $datum) {
             if ($datum['level'] === 'info') {
-                if (! empty($datum['text'])) {
+                if (!empty($datum['text'])) {
                     list($email, $action, $points, , $source) = explode(' ', $datum['text']);
                     $date = $datum['date'];
                     if ($user->email == $email) {
@@ -177,8 +177,8 @@ class AdminController extends Controller
                             'email' => $email,
                             'points' => $points,
                             'date' => $date,
-                            'action' =>$action,
-                            'source'=> $source,
+                            'action' => $action,
+                            'source' => $source,
                         ];
                         $count++;
                     }
@@ -187,7 +187,7 @@ class AdminController extends Controller
         }
 
         return response()->json([
-            'data' => $result, ]);
+            'data' => $result,]);
     }
 
     /**
@@ -226,10 +226,10 @@ class AdminController extends Controller
         }
 
         $ip = $request->ip();
-        $ip_data = @json_decode(file_get_contents('http://www.geoplugin.net/json.gp?ip='.$ip), true, 512, JSON_THROW_ON_ERROR);
+        $ip_data = @json_decode(file_get_contents('http://www.geoplugin.net/json.gp?ip=' . $ip), true, 512, JSON_THROW_ON_ERROR);
 
-        $ipNotAllowed = ! \in_array($ip_data['geoplugin_countryName'], [$request->country, $user->country], true);
-        $countryNotAllowed = ! \in_array($request->country, self::ALLOWED_COUNTRIES, true);
+        $ipNotAllowed = !\in_array($ip_data['geoplugin_countryName'], [$request->country, $user->country], true);
+        $countryNotAllowed = !\in_array($request->country, self::ALLOWED_COUNTRIES, true);
 
         if ($ipNotAllowed or $countryNotAllowed) {
             $this->BlockUser($user, $ipNotAllowed, $request);
@@ -239,12 +239,12 @@ class AdminController extends Controller
         $user->save();
 
         return response()->json([
-            'data' => $user->updated_at, ]);
+            'data' => $user->updated_at,]);
     }
 
     public function inBrainsCallback(Request $request)
     {
-        $localSig = md5((''.$request->PanelistId.$request->RewardId.'MDU3YmQzMjUtODhmMi00M2I5LWI2OTEtNGJmNDUyMzkzMmE0'));
+        $localSig = md5(('' . $request->PanelistId . $request->RewardId . 'MDU3YmQzMjUtODhmMi00M2I5LWI2OTEtNGJmNDUyMzkzMmE0'));
         if ($localSig == $request->Sig) {
             $user = User::where('id', $request->PanelistId)->first();
             $user->points += $request->Reward;
@@ -268,11 +268,11 @@ class AdminController extends Controller
         $tx_id = rawurldecode($_GET['tx_id']);
         $url_signature = rawurldecode($_GET['signature']);
 
-        $data = $cpa.':'.$device_id;
-        if (! empty($request_uuid)) { // only added when non-empty
-            $data = $data.':'.$request_uuid;
+        $data = $cpa . ':' . $device_id;
+        if (!empty($request_uuid)) { // only added when non-empty
+            $data = $data . ':' . $request_uuid;
         }
-        $data = $data.':'.$reward_name.':'.$reward_value.':'.$timestamp.':'.$tx_id;
+        $data = $data . ':' . $reward_name . ':' . $reward_value . ':' . $timestamp . ':' . $tx_id;
 
         $computed_signature = base64_encode(hash_hmac('sha1', $data, $secret_key, true));
         $is_valid = $url_signature == $computed_signature;
@@ -281,7 +281,45 @@ class AdminController extends Controller
             $user = User::where('id', $request_uuid)->first();
             $user->points .= $reward_value;
             $user->save();
-            Log::info($user->email.' earned '.$reward_value.'points from Pollfish');
+            Log::info($user->email . ' earned ' . $reward_value . 'points from Pollfish');
+        }
+    }
+
+    public function adGemCallback(Request $request)
+    {
+        $secret_key = '19k2genj5l3b17d5efaj8h2n';
+        // get the full request url
+        $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http");
+        $request_url = "$protocol://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+
+        // parse the url and query string
+        $parsed_url = parse_url($request_url);
+        parse_str($parsed_url['query'], $query_string);
+
+        // get the verifier value
+        $verifier = $query_string['verifier'] ?? null;
+        $amount = $query_string['amount'] ?? null;
+        $userId = $query_string['user_id'] ?? null;
+        if (is_null($verifier)) {
+            http_response_code(422);
+            exit("Error: missing verifier");
+        }
+        // rebuild url without the verifier
+        unset($query_string['verifier']);
+        $hashless_url = $protocol . '://' . $parsed_url['host'] . $parsed_url['path'] . '?' . http_build_query($query_string, "", "&", PHP_QUERY_RFC3986);
+
+        // calculate the hash and verify it matches the provided one
+        $calculated_hash = hash_hmac('sha256', $hashless_url, $secret_key);
+        if ($calculated_hash !== $verifier) {
+            http_response_code(422);
+            exit('Error: invalid verifier');
+        } else {
+            $user = User::where('id', $userId)->first();
+            $user->points .= $amount;
+            $user->save();
+            Log::info($user->email . ' earned ' . $amount . 'points from AdGem');
+            http_response_code(200);
+            exit('OK');
         }
     }
 
@@ -294,7 +332,7 @@ class AdminController extends Controller
         $sub_id = rawurldecode($_GET['sub_id']);
         $url_signature = $request->header('X-Ayetstudios-Security-Hash');
 
-        $data = $adslot_id.$payout.$placement_identifier.$sub_id;
+        $data = $adslot_id . $payout . $placement_identifier . $sub_id;
 
         $computed_signature = base64_encode(hash_hmac('sha256', $data, $secret_key, true));
         $is_valid = $url_signature == $computed_signature;
@@ -303,7 +341,7 @@ class AdminController extends Controller
             $user = User::where('id', $sub_id)->first();
             $user->points += $payout * 1000;
             $user->save();
-            Log::info($user->email.' earned '.$payout * 300 .'points from Ayet');
+            Log::info($user->email . ' earned ' . $payout * 300 . 'points from Ayet');
         }
     }
 
@@ -334,22 +372,22 @@ class AdminController extends Controller
     public function adJoeCallback(Request $request)
     {
         $s2sToken = 'BXK3N6hXgY1I3jBHm2sm56lYFbpXnDUp';
-        $localSig = sha1(($request->transId.$request->userId.$request->currency.$request->coinAmount.$request->deviceId.$request->sdkAppId.$s2sToken));
+        $localSig = sha1(($request->transId . $request->userId . $request->currency . $request->coinAmount . $request->deviceId . $request->sdkAppId . $s2sToken));
         if ($localSig == $request->sid) {
             $user = User::where('id', $request->userId)->first();
             if ($user != null) {
                 $user->points += $request->coinAmount;
                 $user->save();
-                Log::info($user->email.' earned '.$request->coinAmount.'points from AdJoe');
+                Log::info($user->email . ' earned ' . $request->coinAmount . 'points from AdJoe');
             } else {
                 $user = User::where('advertising_id', $request->deviceId)->first();
                 if ($user != null) {
                     $user->points += $request->coinAmount;
                     $user->save();
-                    Log::info($user->email.' earned '.$request->coinAmount.'points from AdJoe');
+                    Log::info($user->email . ' earned ' . $request->coinAmount . 'points from AdJoe');
                 } else {
                     $requestLog = str_replace("'", "\'", json_encode($request->all()));
-                    Log::info('Incorrect userId from AdJoe'.$requestLog);
+                    Log::info('Incorrect userId from AdJoe' . $requestLog);
                 }
             }
 
@@ -364,7 +402,7 @@ class AdminController extends Controller
         $token = $this->getAuthToken();
 
         $response = Http::withHeaders([
-            'Authorization' => 'Bearer '.$token,
+            'Authorization' => 'Bearer ' . $token,
         ])->get('https://rewards-api.egifter.com/v1/Orders?pageSize=20');
 
         return $response->json();
@@ -376,7 +414,7 @@ class AdminController extends Controller
         $deviceToken = 'fnB4BluDTuyi65rwDyLNud:APA91bE_J_s7RX2taCYpfLnAoQf-PtJLVQA7enl5R7DNXkvVLB43I-5TDjNkV_x4RL5i0i0H2au7_gDHl2GQUxjnSTLFG60dNZvpYADGHu_6TAWDFcqlv0BDL7bVPtfW9Bb90uGDvRK1';
 
         $message = CloudMessage::withTarget('token', $deviceToken)
-             ->withNotification(Notification::create($request->title, $request->body))
+            ->withNotification(Notification::create($request->title, $request->body))
             ->withData(['key' => 'value']);
 
         $messaging->send($message);
@@ -395,7 +433,7 @@ class AdminController extends Controller
         while (strlen($code) < 6) {
             $position = random_int(0, $charactersNumber - 1);
             $character = $characters[$position];
-            $code = $code.$character;
+            $code = $code . $character;
         }
         $user->email_verification_code = $code;
         $user->save();
@@ -413,11 +451,11 @@ class AdminController extends Controller
             $user->save();
 
             return response()->json([
-                'message' => 'emailVerified', ], 200);
+                'message' => 'emailVerified',], 200);
         }
 
         return response()->json([
-            'message' => 'Wrong Code ', ], 403);
+            'message' => 'Wrong Code ',], 403);
     }
 
     public function updateLockScreenPermission(Request $request)
@@ -428,7 +466,7 @@ class AdminController extends Controller
         $user->save();
 
         return response()->json([
-            'data' => $user->updated_at, ]);
+            'data' => $user->updated_at,]);
     }
 
     /**
