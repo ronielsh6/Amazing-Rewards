@@ -103,6 +103,20 @@ let CampaignsTable = function () {
                 id: 'users.points',
                 label: 'User points',
                 type: 'integer'
+            }, {
+                id: 'users.status',
+                label: 'Allow List',
+                type: 'string',
+                default_value: 'active',
+                input: 'radio',
+                values: ['active', 'blocked']
+            }, {
+                id: 'gift_card.pending',
+                label: 'Active Gift Card',
+                type: 'boolean',
+                default_value: 'true',
+                input: 'radio',
+                values: ['true', 'false']
             }
         ];
 
@@ -181,6 +195,22 @@ let CampaignsTable = function () {
             cleanForm();
         });
 
+        $("#flexSwitchCheckEmail").change(function() {
+            if(this.checked) {
+                console.log("email checked");
+            } else if (!$("#flexSwitchCheckPush").checked) {
+                $("#flexSwitchCheckPush").prop('checked', true);
+            }
+        });
+
+        $("#flexSwitchCheckPush").change(function() {
+            if(this.checked) {
+                console.log("push checked");
+            } else if (!$("#flexSwitchCheckEmail").checked) {
+                $("#flexSwitchCheckEmail").prop('checked', true);
+            }
+        });
+
         let cleanForm = function () {
             $.datepicker._clearDate($('#start_date'));
             $.datepicker._clearDate($('#end_date'));
@@ -201,6 +231,8 @@ let CampaignsTable = function () {
             $('#deep_link').val(data['deep_link']);
             $('#title').val(data['title']);
             $('#body').val(data['body']);
+            $('#flexSwitchCheckPush').val(data['is_push']);
+            $('#flexSwitchCheckEmail').val(data['is_email']);
             $('#campaignFormModal').modal('show');
         };
 
@@ -265,6 +297,8 @@ let CampaignsTable = function () {
                 deep_link: $('#deep_link').val(),
                 title: $('#title').val(),
                 body: $('#body').val(),
+                is_push: $('#flexSwitchCheckPush').is(":checked") ? 1 : 0,
+                is_email: $('#flexSwitchCheckEmail').is(":checked") ? 1 : 0,
                 parameters: $parameters.sql
             };
 

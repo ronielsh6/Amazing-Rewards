@@ -6,6 +6,7 @@ use App\Models\Campaign;
 use App\Models\Execution;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class CampaignJobs
@@ -21,7 +22,7 @@ class CampaignJobs
             $executionTime = new \DateTime($campaign->execution_time);
             if (($startDate <= $dateTime) && ($endDate >= $dateTime) && $time === $executionTime->format('h:i')) {
                 $startTime = date('h:i:s');
-                $query = User::with('getGiftCards');
+                $query = DB::table('users')->leftJoin('gift_card', 'users.id', '=', 'gift_card.owner');
                 $query->whereRaw($campaign->parameters);
                 $models = $query->get();
                 $errors = false;

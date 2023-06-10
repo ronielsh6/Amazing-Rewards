@@ -8,6 +8,8 @@ use App\Models\Execution;
 use App\Models\User;
 use App\Services\CloudMessages;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use mysql_xdevapi\Table;
 
 class CampaignController extends Controller
 {
@@ -103,10 +105,14 @@ class CampaignController extends Controller
         $id = $request->get('id');
         $campaign = Campaign::find($id);
 
-        $users = User::with('getGiftCards')
-            ->whereRaw($campaign->parameters)
-            ->get();
+//        select * from `users` WHERE id IN (SELECT DISTINCT(`users`.id) from `users` left join `gift_card` on `users`.`id` = `gift_card`.`owner` where users.points = 90000)
 
+        $subQuery = User::with('getGiftCards')
+            ->select('id')
+            ->whereRaw($campaign->parameters)
+            ->distinct();
+        $users = User::whereRaw("users.id in ({$subQuery->toSql()})")
+            ->get();
         $dateTime = new \DateTime('now');
 
         $errors = false;
@@ -124,7 +130,7 @@ class CampaignController extends Controller
     public function queryImpact(Request $request)
     {
         $query = $request->get('query');
-        $users = User::with('getGiftCards')
+        $users = DB::table('users')->leftJoin('gift_card', 'users.id', '=', 'gift_card.owner')
             ->whereRaw($query)
             ->get()->count();
 

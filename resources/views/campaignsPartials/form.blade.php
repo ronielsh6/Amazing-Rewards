@@ -3,8 +3,24 @@
     <input type="hidden" id="updateUri" value="{{ route('updateCampaign') }}">
     <input type="hidden" id="method" value="POST">
     <input type="hidden" id="campaign_id" name="campaign_id" value="0">
-    <div class="col-12">
+    <div class="col-6">
         <div id="builder"></div>
+    </div>
+    <div class="col-6">
+        <ul class="list-group">
+            <li class="list-group-item border-0 px-0">
+                <div class="form-check form-switch ps-0">
+                    <input class="form-check-input ms-auto" type="checkbox" id="flexSwitchCheckPush" checked>
+                    <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" for="flexSwitchCheckPush">Send By Push Notification</label>
+                </div>
+            </li>
+            <li class="list-group-item border-0 px-0">
+                <div class="form-check form-switch ps-0">
+                    <input class="form-check-input ms-auto" type="checkbox" id="flexSwitchCheckEmail">
+                    <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" for="flexSwitchCheckEmail">Send by Email</label>
+                </div>
+            </li>
+        </ul>
     </div>
     <div class="col-12">
         <span class="text-danger">Campaign will impact on </span><span id="impact-indicator" class="text-danger"> - users</span>
@@ -26,6 +42,9 @@
                 <option value="shop_screen">Shop Screen</option>
                 <option value="rewards_screen">Rewards Screen</option>
                 <option value="settings_screen">Settings Screen</option>
+                <option value="fluent_sephora">$750 to Sephora</option>
+                <option value="fluent_amazon">$750 to Amazon</option>
+                <option value="fluent_cash">$750 to Cash</option>
                 <option value="overlay_permission_request">Lock Screen Permission</option>
                 <option value="app_update">App Update</option>
             </select>

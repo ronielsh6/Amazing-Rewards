@@ -2,6 +2,8 @@
 
 namespace App\Jobs;
 
+use App\Mail\BuildMail;
+use App\Mail\CampaignMail;
 use App\Models\Campaign;
 use App\Models\User;
 use App\Services\CloudMessages;
@@ -11,6 +13,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Mail;
 
 class ProcessCampaign implements ShouldQueue
 {
@@ -44,6 +47,11 @@ class ProcessCampaign implements ShouldQueue
      */
     public function handle()
     {
-        $this->cloudMessages->sendMessage($this->campaign->title, $this->campaign->body, $this->user, ['deep_link' => $this->campaign->deep_link], true);
+        if ($this->campaign->is_push){
+            $this->cloudMessages->sendMessage($this->campaign->title, $this->campaign->body, $this->user, ['deep_link' => $this->campaign->deep_link], true);
+        }
+        if ($this->campaign->is_email){
+            Mail::to($this->user->email)->send(new CampaignMail($this->campaign));
+        }
     }
 }
