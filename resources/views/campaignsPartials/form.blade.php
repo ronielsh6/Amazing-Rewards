@@ -21,6 +21,27 @@
                 </div>
             </li>
         </ul>
+        <label for="csv">Campaign Image:</label>
+        <input type="file" name="csv" class="filepond"/>
+    </div>
+    <div class="col-6" id="image_links_container" hidden= "true">
+        <div class="form-group">
+            <label for="image_link">Image link</label>
+            <select class="form-control select2" name="image_link" id="image_link">
+                <option value="news_screen">News Screen</option>
+                <option value="earn_screen">Earn Screen</option>
+                <option value="play_games">Games</option>
+                <option value="take_surrveys">Surveys</option>
+                <option value="shop_screen">Shop Screen</option>
+                <option value="rewards_screen">Rewards Screen</option>
+                <option value="settings_screen">Settings Screen</option>
+                <option value="fluent_sephora">$750 to Sephora</option>
+                <option value="fluent_amazon">$750 to Amazon</option>
+                <option value="fluent_cash">$750 to Cash</option>
+                <option value="overlay_permission_request">Lock Screen Permission</option>
+                <option value="app_update">App Update</option>
+            </select>
+        </div>
     </div>
     <div class="col-12">
         <span class="text-danger">Campaign will impact on </span><span id="impact-indicator" class="text-danger"> - users</span>

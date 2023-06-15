@@ -2,12 +2,14 @@
 
 namespace App\Services;
 
+use App\Mail\CampaignMail;
 use App\Models\Campaign;
 use App\Models\Execution;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class CampaignJobs
 {
@@ -27,7 +29,12 @@ class CampaignJobs
                 $models = $query->get();
                 $errors = false;
                 foreach ($models as $model) {
-                    $result = (new CloudMessages())->sendMessage($campaign->title, $campaign->body, $model, ['deep_link' => $campaign->deep_link], true);
+                    if ($campaign->is_push) {
+                        $result = (new CloudMessages())->sendMessage($campaign->title, $campaign->body, $model, ['deep_link' => $campaign->deep_link, 'image' => $campaign->image, 'image_link' => $campaign->image_link], true);
+                    }
+                    if ($campaign->is_email){
+                        Mail::to($model->email)->send(new CampaignMail($campaign));
+                    }
                     if (! $result) {
                         $errors = true;
                     }

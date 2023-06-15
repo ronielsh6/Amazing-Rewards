@@ -33,9 +33,11 @@ class CampaignMail extends Mailable
     public function build()
     {
         $link = $this->getLinkByDeep($this->campaign->deep_link);
+        $linkImage = $this->getLinkByDeep($this->campaign->image_link);
         $data = [
             'campaign' => $this->campaign,
-            'link'   => $link
+            'link'   => $link,
+            'link_image'   => $linkImage
         ];
         $this->subject($this->campaign->title);
 

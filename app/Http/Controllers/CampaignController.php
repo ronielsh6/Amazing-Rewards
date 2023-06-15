@@ -9,7 +9,9 @@ use App\Models\User;
 use App\Services\CloudMessages;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
 use mysql_xdevapi\Table;
+use Illuminate\Support\Facades\Storage;
 
 class CampaignController extends Controller
 {
@@ -60,6 +62,8 @@ class CampaignController extends Controller
     public function createCampaign(Request $request)
     {
         $campaign = new Campaign($request->all());
+        $url = URL::to('/').''.Storage::url($request->image);
+        $campaign->image = $url;
         $campaign->save();
         if ($campaign) {
             return response()->json([

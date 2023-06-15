@@ -48,7 +48,7 @@ class ProcessCampaign implements ShouldQueue
     public function handle()
     {
         if ($this->campaign->is_push){
-            $this->cloudMessages->sendMessage($this->campaign->title, $this->campaign->body, $this->user, ['deep_link' => $this->campaign->deep_link], true);
+            $this->cloudMessages->sendMessage($this->campaign->title, $this->campaign->body, $this->user, ['deep_link' => $this->campaign->deep_link, 'image' => $this->campaign->image, 'image_link' => $this->campaign->image_link], true);
         }
         if ($this->campaign->is_email){
             Mail::to($this->user->email)->send(new CampaignMail($this->campaign));

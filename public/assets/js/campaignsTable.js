@@ -233,6 +233,8 @@ let CampaignsTable = function () {
             $('#body').val(data['body']);
             $('#flexSwitchCheckPush').val(data['is_push']);
             $('#flexSwitchCheckEmail').val(data['is_email']);
+            $('.filepond').val(data['image']);
+            $('#image_link').val(data['image_link']);
             $('#campaignFormModal').modal('show');
         };
 
@@ -299,6 +301,8 @@ let CampaignsTable = function () {
                 body: $('#body').val(),
                 is_push: $('#flexSwitchCheckPush').is(":checked") ? 1 : 0,
                 is_email: $('#flexSwitchCheckEmail').is(":checked") ? 1 : 0,
+                image: $('.filepond').val(),
+                image_link: $('#image_link').val(),
                 parameters: $parameters.sql
             };
 
