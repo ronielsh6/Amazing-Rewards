@@ -11,6 +11,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
@@ -58,7 +59,7 @@ class AuthController extends Controller
             $user->referred_by = $userReferrer->id;
             $user->save();
         }
-
+        Log::info($user->email . ' earned 1000 points from SignUp');
         return response($response, 200);
     }
 
@@ -120,6 +121,7 @@ class AuthController extends Controller
             $user = User::create($request->toArray());
             $token = $user->createToken('Laravel Password Grant Client')->accessToken;
             $response = ['token' => $token];
+            Log::info($user->email . ' earned 1000 points from SignUp');
         }
 
         $deviceExist = Device::where('device_id', $request->device_id)->first();
