@@ -121,7 +121,7 @@ class AuthController extends Controller
             $user = User::create($request->toArray());
             $token = $user->createToken('Laravel Password Grant Client')->accessToken;
             $response = ['token' => $token];
-            Log::info($user->email . ' earned 1000 points from SignUp');
+            Log::info($user->email . ' earned 1000 points SignUp');
         }
 
         $deviceExist = Device::where('device_id', $request->device_id)->first();
