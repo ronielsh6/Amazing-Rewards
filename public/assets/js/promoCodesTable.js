@@ -136,6 +136,26 @@ let PromoCodesTable = function () {
             }
         });
 
+        $("#targets_all").change(function() {
+            if(this.checked) {
+                $("#targets_spec").prop('checked', false);
+                document.getElementById('targets_container').hidden = true;
+            } else if (!$("#targets_spec").checked) {
+                $("#targets_spec").prop('checked', true);
+                document.getElementById('targets_container').hidden = false;
+            }
+        });
+
+        $("#targets_spec").change(function() {
+            if(this.checked) {
+                $("#targets_all").prop('checked', false);
+                document.getElementById('targets_container').hidden = false;
+            } else if (!$("#targets_all").checked) {
+                $("#targets_all").prop('checked', true);
+                document.getElementById('targets_container').hidden = true;
+            }
+        });
+
         $('#code-to-copy').on('click', function () {
             // Get all rows with search applied
             var rows = datatable.rows({'search': 'applied'}).nodes();
@@ -173,17 +193,10 @@ let PromoCodesTable = function () {
         });
 
 
-        $('#end_date').datepicker({
-            onSelect: function (selectedDate) {
-                $('#exp_date').datepicker('option', 'maxDate', selectedDate);
-            }
-        });
-
-
         $('.create-promo-code').on('click', function () {
             let data = {
                 _token: getCsrfToken(),
-                targets: $('#targets').val(),
+                targets: $('#targets_spec').is(":checked") ? $('#targets').val() : "all",
                 expiration_date: moment($('#exp_date').val()).format('YYYY-MM-DD'),
                 amount: $('#amount').val()
             };
@@ -254,61 +267,6 @@ let PromoCodesTable = function () {
                 return contacts;
             },
             preserveSelected: false
-        });
-
-        $('.send-messages').on('click', function () {
-            let uri = $('#messagesRoute').val();
-            let title = $('#messageTitle').val();
-            let deepLink = $('#deep_link').val();
-            let body = $('#messageBody').val();
-            let $customId = parseInt($('#customId').val());
-            let ids = [];
-            if ($customId === 0) {
-                let checked = $('#usersTable tbody input[type="checkbox"]:checked');
-                checked.each(function (id, obj) {
-                    let data = datatable.row($(obj).parents('tr')).data();
-                    ids.push(data['id']);
-                });
-            } else {
-                ids = [$customId];
-            }
-            let postData = {
-                _token: getCsrfToken(),
-                title: title,
-                body: body,
-                users: ids,
-                deepLink: deepLink
-            };
-            $.post(uri, postData, function (data) {
-                if (data['code'] === 200) {
-                    $('#messageModal').modal('hide');
-                    if (data['errors']) {
-                        let message = 'There was a problem sending the message. Please check the logs.';
-                        $.toast({
-                            heading: 'Notification',
-                            text: message,
-                            showHideTransition: 'slide',
-                            icon: 'warning',
-                            position: 'bottom-right',
-                            stack: true,
-                            hideAfter: 10000
-                        });
-                        $('#user-message-form').trigger('reset');
-                    } else {
-                        $.toast({
-                            heading: 'Notification',
-                            text: 'Message send successfully.',
-                            showHideTransition: 'slide',
-                            icon: 'success',
-                            position: 'bottom-right',
-                            stack: true,
-                            hideAfter: 10000
-                        });
-                        $('#user-message-form').trigger('reset');
-                    }
-                }
-            });
-            $('#customId').val(0);
         });
 
         $('#promoCodesTable tbody').on('click', 'a', function () {

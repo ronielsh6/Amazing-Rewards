@@ -10,8 +10,8 @@
             <div class="modal-body">
                 @include($body)
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary modal-dismiss" data-dismiss="modal">Close</button>
+            <div style="align-content: start" class="modal-footer">
+                <button style="alignment: left" type="button" class="btn btn-secondary modal-dismiss" data-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-{{ $color }} {{ $modalButtonId }}">{{ $modalButtonText }}</button>
             </div>
         </div>

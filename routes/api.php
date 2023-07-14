@@ -41,6 +41,7 @@ Route::group(['middleware' => 'auth:api', 'namespace'], function () {
     Route::post('user/verifyEmail', 'App\Http\Controllers\Api\AdminController@verifyEmail');
     Route::post('user/updateLockScreenPermission', 'App\Http\Controllers\Api\AdminController@updateLockScreenPermission');
     Route::get('user/points-logs', 'App\Http\Controllers\Api\AdminController@getPointsLogs');
+    Route::post('user/redeem-code', 'App\Http\Controllers\Api\AdminController@redeemCode');
 });
 
 Route::group(['middleware' => 'guest:api', 'namespace'], function () {

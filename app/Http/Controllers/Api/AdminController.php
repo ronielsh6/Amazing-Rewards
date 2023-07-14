@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Mail\BuildMail;
 use App\Models\BlockedLog;
 use App\Models\Device;
+use App\Models\PromoCodes;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -452,6 +453,61 @@ class AdminController extends Controller
 
             return response()->json([
                 'message' => 'emailVerified',], 200);
+        }
+
+        return response()->json([
+            'message' => 'Wrong Code ',], 403);
+    }
+
+    public function redeemCode(Request $request)
+    {
+        $user = User::find($request->user()->id);
+        $promoCode = PromoCodes::where('code', $request->code)->first();
+
+        if($promoCode != null){
+            $expDate = Carbon::parse($promoCode->expiration_date);
+            $targets = json_decode($promoCode->targets);
+            if($expDate->isPast()){
+                return response()->json([
+                    'message' => 'Promo Code Expired',], 403);
+            }
+            if ($targets->data != "all" && !in_array($user->id, $targets->data)){
+                return response()->json([
+                    'message' => 'You are not authorize to use this promo code',], 403);
+            } else {
+                if ($targets->data == "all"){
+                    $users = User::select('id')->get()->toArray();
+                    $user->points = $user->points += $promoCode->amount;
+                    $user->save();
+
+                    $ids = array_column($users, 'id');
+                    foreach (array_keys($ids, $user->id) as $key) {
+                        unset($ids[$key]);
+                    }
+                    $promoCode->targets = json_encode( [
+                        'data' => array_values($ids)
+                    ]);
+                    $promoCode->save();
+
+                } else {
+                    foreach (array_keys($targets->data, $user->id) as $key) {
+                        unset($targets->data[$key]);
+                    }
+                    $promoCode->targets = json_encode( [
+                        'data' => array_values($targets->data)
+                    ]);
+                    $promoCode->save();
+                }
+                return response()->json([
+                    'message' => 'Congratulations, you earned '.$promoCode->amount.' points',
+                    ], 200);
+            }
+
+
+
+        } else{
+            return response()->json([
+                'message' => 'Wrong Code ',], 403);
         }
 
         return response()->json([
