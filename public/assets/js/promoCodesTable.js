@@ -120,7 +120,13 @@ let PromoCodesTable = function () {
             $('#title').val('');
             $('#body').val('');
             $('#amount').val('');
+            $('#custom_code').val('');
+            $("#targets_all").prop('checked', true);
+            $("#targets_spec").prop('checked', false);
+            $("#targets_generated").prop('checked', true);
             $('#targets').selectpicker('deselectAll');
+            document.getElementById('targets_container').hidden = true;
+            document.getElementById('custom_code_container').hidden = true;
         }
 
         $('#example-select-all').on('click', function () {
@@ -153,6 +159,14 @@ let PromoCodesTable = function () {
             } else if (!$("#targets_all").checked) {
                 $("#targets_all").prop('checked', true);
                 document.getElementById('targets_container').hidden = true;
+            }
+        });
+
+        $("#targets_generated").change(function() {
+            if(this.checked) {
+                document.getElementById('custom_code_container').hidden = true;
+            } else if (!$("#targets_all").checked) {
+                document.getElementById('custom_code_container').hidden = false;
             }
         });
 
@@ -196,6 +210,7 @@ let PromoCodesTable = function () {
         $('.create-promo-code').on('click', function () {
             let data = {
                 _token: getCsrfToken(),
+                code: $('#custom_code').val(),
                 targets: $('#targets_spec').is(":checked") ? $('#targets').val() : "all",
                 expiration_date: moment($('#exp_date').val()).format('YYYY-MM-DD'),
                 amount: $('#amount').val()

@@ -489,7 +489,18 @@ class HomeController extends Controller
         $promoCode = new PromoCodes();
         $promoCode->amount = $request->amount;
         $promoCode->expiration_date = $request->expiration_date;
-        $promoCode->code = $this->generatePromoCode();
+        if ($request->code != null){
+            if (PromoCodes::where('code', $request->code)->exists()) {
+                return response()->json([
+                    'code' => 400,
+                    'message' => 'Code already exist.',
+                ]);
+            } else {
+                $promoCode->code = $request->code;
+            }
+        } else {
+            $promoCode->code = $this->generatePromoCode();
+        }
         $promoCode->targets = $jsonTargets;
         $promoCode->save();
         if ($promoCode) {
