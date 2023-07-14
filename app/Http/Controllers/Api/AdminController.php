@@ -475,11 +475,11 @@ class AdminController extends Controller
                 return response()->json([
                     'message' => 'You are not authorize to use this promo code',], 403);
             } else {
-                if ($targets->data == "all"){
-                    $users = User::select('id')->get()->toArray();
-                    $user->points = $user->points += $promoCode->amount;
-                    $user->save();
+                $users = User::select('id')->get()->toArray();
+                $user->points = $user->points += $promoCode->amount;
+                $user->save();
 
+                if ($targets->data == "all"){
                     $ids = array_column($users, 'id');
                     foreach (array_keys($ids, $user->id) as $key) {
                         unset($ids[$key]);
@@ -487,8 +487,6 @@ class AdminController extends Controller
                     $promoCode->targets = json_encode( [
                         'data' => array_values($ids)
                     ]);
-                    $promoCode->save();
-
                 } else {
                     foreach (array_keys($targets->data, $user->id) as $key) {
                         unset($targets->data[$key]);
@@ -496,11 +494,13 @@ class AdminController extends Controller
                     $promoCode->targets = json_encode( [
                         'data' => array_values($targets->data)
                     ]);
-                    $promoCode->save();
                 }
+                $promoCode->save();
+
                 return response()->json([
                     'message' => 'Congratulations, you earned '.$promoCode->amount.' points',
-                    ], 200);
+                ], 200);
+
             }
 
 
