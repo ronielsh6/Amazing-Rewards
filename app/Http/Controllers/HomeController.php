@@ -4,14 +4,18 @@ namespace App\Http\Controllers;
 
 use App\GiftCard;
 use App\Models\BlockedLog;
+use App\Models\Campaign;
 use App\Models\Device;
 use App\Models\GiftcardLog;
+use App\Models\PromoCodes;
 use App\Models\User;
 use App\Services\CloudMessages;
 use Google\CRC32\Table;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 
 class HomeController extends Controller
 {
@@ -58,11 +62,11 @@ class HomeController extends Controller
         $column = $request->get('columns')[$orderElement['column']]['data'];
         $usersQuery = User::where('status', '=', 'active');
 
-        if (! empty($username)) {
-            $usersQuery->where('email', 'like', '%'.$username.'%');
+        if (!empty($username)) {
+            $usersQuery->where('email', 'like', '%' . $username . '%');
         }
 
-        if (! empty($points)) {
+        if (!empty($points)) {
             $between = \explode(',', $points);
             if (\count($between) > 1) {
                 $usersQuery->whereBetween('points', $between);
@@ -88,11 +92,11 @@ class HomeController extends Controller
         $column = $request->get('columns')[$orderElement['column']]['data'];
         $usersQuery = User::where('status', '=', 'blocked');
 
-        if (! empty($username)) {
-            $usersQuery->where('email', 'like', '%'.$username.'%');
+        if (!empty($username)) {
+            $usersQuery->where('email', 'like', '%' . $username . '%');
         }
 
-        if (! empty($points)) {
+        if (!empty($points)) {
             $between = \explode(',', $points);
             if (\count($between) > 1) {
                 $usersQuery->whereBetween('points', $between);
@@ -157,17 +161,17 @@ class HomeController extends Controller
         $orderDir = $orderElement['dir'];
         $column = $request->get('columns')[$orderElement['column']]['data'];
         $giftCardsQuery = GiftCard::with(['getOwner']);
-        if (! empty($userId) && $userId !== 0) {
+        if (!empty($userId) && $userId !== 0) {
             $giftCardsQuery->where('owner', $userId);
         }
 
-        if (! empty($username)) {
+        if (!empty($username)) {
             $giftCardsQuery->whereHas('getOwner', function ($query) use ($username) {
-                $query->where('email', 'like', '%'.$username.'%');
+                $query->where('email', 'like', '%' . $username . '%');
             });
         }
 
-        if (! empty($points)) {
+        if (!empty($points)) {
             $between = \explode(',', $points);
             if (\count($between) > 1) {
                 $giftCardsQuery->whereBetween('amount', $between);
@@ -207,10 +211,10 @@ class HomeController extends Controller
         $column = $request->get('columns')[$orderElement['column']]['data'];
         $giftCardsLogsQuery = GiftcardLog::with(['getGiftcard', 'getGiftcard.getOwner']);
 
-        if (! empty($username)) {
+        if (!empty($username)) {
             $giftCardsLogsQuery->whereHas('getGiftcard', function ($query) use ($username) {
                 $query->whereHas('getOwner', function ($subquery) use ($username) {
-                    $subquery->where('email', 'like', '%'.$username.'%');
+                    $subquery->where('email', 'like', '%' . $username . '%');
                 });
 
                 $query->where('pending', true);
@@ -241,7 +245,7 @@ class HomeController extends Controller
             'AccessToken' => env('EGITFTER_ACCESS_TOKEN'),
             //            'AccessToken' => 'b9wh1nc1br1nt9nc9r69k16br9t2d710l9t11v1981nt989l16nd2v0nd0nh9r0j', PROD
             'Email' => 'info@myamazingrewards.com',
-        ])->post(env('EGITFTER_URL').'/v1/Tokens');
+        ])->post(env('EGITFTER_URL') . '/v1/Tokens');
 
         return $response->json('value');
     }
@@ -257,7 +261,7 @@ class HomeController extends Controller
         $giftCardItem = GiftCard::where('id', $giftcard)
             ->where('owner', $user)->first();
 
-        if (! $giftCardItem) {
+        if (!$giftCardItem) {
             return response()->json([
                 'code' => 400,
                 'message' => 'Data error',
@@ -284,7 +288,7 @@ class HomeController extends Controller
 
             return response()->json([
                 'code' => 404,
-                'message' => 'It wasn`t possible to enable the gift card. '.$exception->getMessage(),
+                'message' => 'It wasn`t possible to enable the gift card. ' . $exception->getMessage(),
             ]);
         }
 
@@ -334,7 +338,7 @@ class HomeController extends Controller
         foreach ($ids as $id) {
             $user = User::find($id);
             $response = (new CloudMessages())->sendMessage($title, $body, $user, ['deep_link' => $deepLink], true);
-            if (! $response) {
+            if (!$response) {
                 $errors = true;
             }
         }
@@ -354,8 +358,8 @@ class HomeController extends Controller
         $token = $this->getAuthToken();
 
         $response = Http::withHeaders([
-            'Authorization' => 'Bearer '.$token,
-        ])->post(env('EGITFTER_URL').'/v1/Orders',
+            'Authorization' => 'Bearer ' . $token,
+        ])->post(env('EGITFTER_URL') . '/v1/Orders',
             ['lineItems' => [[
                 'productId' => 'AMAZON',
                 'quantity' => 1,
@@ -368,7 +372,7 @@ class HomeController extends Controller
                     'to' => $name,
                 ],
             ]],
-                'poNumber' => $user->email.''.$card->id,
+                'poNumber' => $user->email . '' . $card->id,
                 'type' => 'Links',
                 'note' => $user->email,
             ]);
@@ -391,13 +395,32 @@ class HomeController extends Controller
         $column = $request->get('columns')[$orderElement['column']]['data'];
         $blockedLogsQuery = BlockedLog::with('getUser');
 
-        if (! empty($username)) {
+        if (!empty($username)) {
             $blockedLogsQuery->whereHas('getUser', function ($query) use ($username) {
-                $query->where('email', 'like', '%'.$username.'%');
+                $query->where('email', 'like', '%' . $username . '%');
             });
         }
 
         return $this->extracted($blockedLogsQuery, 'created_at', $orderDir, $start, $page);
+    }
+
+    public function getPromoCodes(Request $request)
+    {
+        $users = User::query()->get();
+        return view('promoCodes', ['users' => $users]);
+    }
+
+    public function getPromoCodesList(Request $request)
+    {
+        $start = $request->get('start');
+        $page = $request->get('length');
+        $username = $request->get('username');
+        $orderElement = $request->get('order')[0];
+        $orderDir = $orderElement['dir'];
+        $column = $request->get('columns')[$orderElement['column']]['data'];
+        $promoCodesQuery = PromoCodes::query();
+
+        return $this->extracted($promoCodesQuery, 'created_at', $orderDir, $start, $page);
     }
 
     /**
@@ -424,5 +447,92 @@ class HomeController extends Controller
             'recordsTotal' => $totalRecordsFiltered,
             'recordsFiltered' => $totalRecordsFiltered,
         ]);
+    }
+
+    public function deletePromoCode(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $promoId = $request->get('id');
+        $promoCode = PromoCodes::find($promoId)->delete();
+
+        return response()->json([
+            'code' => 200,
+            'message' => 'Promo Code deleted sucessfully',
+        ]);
+    }
+
+    public function generatePromoCode()
+    {
+        $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersNumber = strlen($characters);
+        $codeLength = 6;
+
+        $code = '';
+
+        while (strlen($code) < 9) {
+            $position = random_int(0, $charactersNumber - 1);
+            $character = $characters[$position];
+            $code .= $character;
+        }
+
+        if (PromoCodes::where('code', $code)->exists()) {
+            $this->generatePromoCode();
+        }
+
+        return $code;
+    }
+
+    public function createPromoCode(Request $request)
+    {
+        $jsonTargets = json_encode(response()->json(
+            ["data" => $request->targets]
+        )->getData());
+        $promoCode = new PromoCodes();
+        $promoCode->amount = $request->amount;
+        $promoCode->expiration_date = $request->expiration_date;
+        $promoCode->code = $this->generatePromoCode();
+        $promoCode->targets = $jsonTargets;
+        $promoCode->save();
+        if ($promoCode) {
+            return response()->json([
+                'code' => 200,
+                'message' => 'Campaign created successfully',
+            ]);
+        }
+
+        return response()->json([
+            'code' => 400,
+            'message' => 'Error creating promo code',
+        ]);
+    }
+
+    public function updatePromoCode(Request $request)
+    {
+        $promoCode = new PromoCodes($request->all());
+        $promoCode->save();
+        if ($promoCode) {
+            return response()->json([
+                'code' => 200,
+                'message' => 'Campaign created successfully',
+            ]);
+        }
+
+        return response()->json([
+            'code' => 400,
+            'message' => 'Error creating promo code',
+        ]);
+    }
+
+    public function filterPromoTarget(Request $request)
+    {
+        $start = $request->get('start');
+        $page = $request->get('length');
+        $orderElement = $request->get('order')[0];
+        $orderDir = $orderElement['dir'];
+        $q = $request->get('q');
+        $column = $request->get('columns')[$orderElement['column']]['data'];
+        $usersQuery = User::where('email', 'like', '%' . $q . '%');
+
+
+        return $this->extracted($usersQuery, $column, $orderDir, $start, $page);
     }
 }

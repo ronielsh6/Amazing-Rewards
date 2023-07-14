@@ -51,3 +51,11 @@ Route::delete('/uploads/remove', [App\Http\Controllers\FileUploadController::cla
 //BLOCKED LOGS ROUTES
 Route::get('/blocked-logs', [App\Http\Controllers\HomeController::class, 'getBlockedLogs'])->name('blockedLogs');
 Route::get('/blocked-logs/list', [App\Http\Controllers\HomeController::class, 'getBlockedLogsList'])->name('blockedLogsList');
+
+//PROMO CODE ROUTES
+Route::get('/promo-codes', [App\Http\Controllers\HomeController::class, 'getPromoCodes'])->name('promoCodes');
+Route::get('/promo-codes/list', [App\Http\Controllers\HomeController::class, 'getPromoCodesList'])->name('promoCodesList');
+Route::post('/promo-codes/delete', [App\Http\Controllers\HomeController::class, 'deletePromoCode'])->name('promoCodeDelete');
+Route::post('/promo-codes/create', [App\Http\Controllers\HomeController::class, 'createPromoCode'])->name('createPromoCode');
+Route::post('/promo-codes/update', [App\Http\Controllers\HomeController::class, 'updatePromoCode'])->name('updatePromoCode');
+Route::post('/promo-codes/filter', [App\Http\Controllers\HomeController::class, 'filterPromoTarget'])->name('filterPromoTarget');
