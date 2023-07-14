@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('code')->unique();
             $table->dateTime('expiration_date');
-            $table->json('targets')->nullable();
+            $table->string('targets')->nullable();
             $table->timestamps();
         });
     }
