@@ -36,6 +36,7 @@ Route::group(['middleware' => 'auth:api', 'namespace'], function () {
     Route::get('cards', 'App\Http\Controllers\Api\AdminController@getGiftCards');
     Route::post('cards/create', 'App\Http\Controllers\Api\AdminController@createGiftCard');
     Route::post('user/addPoints', 'App\Http\Controllers\Api\AdminController@addPoints');
+    Route::post('user/spinResult', 'App\Http\Controllers\Api\AdminController@spinResult');
     Route::post('user/updateFcmToken', 'App\Http\Controllers\Api\AdminController@updateFcmToken');
     Route::post('user/requestEmailCode', 'App\Http\Controllers\Api\AdminController@sendVerificationCode');
     Route::post('user/verifyEmail', 'App\Http\Controllers\Api\AdminController@verifyEmail');

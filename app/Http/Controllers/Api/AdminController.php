@@ -143,6 +143,21 @@ class AdminController extends Controller
         return response()->json($user);
     }
 
+    public function spinResult(Request $request)
+    {
+        $user = User::find($request->user()->id);
+        if ($user->spins > 0){
+            if ($request->earnedPoints != null && $request->earnedPoints > 0){
+                $user->points += $request->earnedPoints;
+                Log::info($user->email . ' earned ' . $request->points . 'points from Spin');
+            }
+            $user->spins -= 1;
+            $user->touch();
+            $user->save();
+        }
+        return response()->json($user);
+    }
+
     public function getUserReferralCode(Request $request)
     {
         $user = User::find($request->user()->id);
