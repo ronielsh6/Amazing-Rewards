@@ -149,7 +149,7 @@ class AdminController extends Controller
         if ($user->spins > 0){
             if ($request->earnedPoints != null && $request->earnedPoints > 0){
                 $user->points += $request->earnedPoints;
-                Log::info($user->email . ' earned ' . $request->points . 'points from Spin');
+                Log::info($user->email . ' earned ' . $request->earnedPoints . 'points from Spin');
             }
             $user->spins -= 1;
             $user->touch();
