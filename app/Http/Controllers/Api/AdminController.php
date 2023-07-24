@@ -143,7 +143,7 @@ class AdminController extends Controller
         return response()->json($user);
     }
 
-    public function spinResult(Request $request)
+    public function spinResult(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = User::find($request->user()->id);
         if ($user->spins > 0){
@@ -155,6 +155,15 @@ class AdminController extends Controller
             $user->touch();
             $user->save();
         }
+        return response()->json($user);
+    }
+
+    public function addSpin(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $user = User::find($request->user()->id);
+            $user->spins += 1;
+            $user->touch();
+            $user->save();
         return response()->json($user);
     }
 
