@@ -38,7 +38,7 @@ class AuthController extends Controller
 
         $existDevice = Device::where('device_id', $request->device_id)->first();
         $user = User::create($request->toArray());
-
+        $user->spins = 2;
         if ($existDevice) {
             $user->getDevices()->attach($existDevice);
         } else {
@@ -119,6 +119,7 @@ class AuthController extends Controller
         } else {
             $request['password'] = Hash::make($request['password']);
             $user = User::create($request->toArray());
+            $user->spins = 2;
             $token = $user->createToken('Laravel Password Grant Client')->accessToken;
             $response = ['token' => $token];
             Log::info($user->email.' earned 1000points from SignUp');
