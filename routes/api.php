@@ -20,6 +20,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::group(['prefix' => 'auth'], function () {
     Route::post('login', 'App\Http\Controllers\Api\AuthController@login')->name('login');
+    Route::post('authenticate', 'App\Http\Controllers\Api\AuthController@authenticate')->name('authenticate');
     Route::post('signup', 'App\Http\Controllers\Api\AuthController@signup');
     Route::post('googleAuth', 'App\Http\Controllers\Api\AuthController@googleAuth');
 });

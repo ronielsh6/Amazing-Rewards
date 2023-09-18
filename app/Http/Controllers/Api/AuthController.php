@@ -200,6 +200,16 @@ class AuthController extends Controller
 
         return response()->json($response, 422);
     }
+    public function authenticate(Request $request): void
+    {
+        $user = User::where('email', $request->email)->first();
+
+        if ($user) {
+            $this->login($request);
+        }else{
+            $this->signup($request);
+        }
+    }
 
     public function logout(Request $request)
     {
