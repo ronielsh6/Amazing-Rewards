@@ -60,7 +60,7 @@ class AuthController extends Controller
             $user->save();
         }
         Log::info($user->email. ' earned 1000points from SignUp');
-        return response($response, 200);
+        return response()->json($response);
     }
 
     /**
@@ -187,8 +187,7 @@ class AuthController extends Controller
             if (Hash::check($request->password, $user->password)) {
                 $token = $user->createToken('Laravel Password Grant Client')->accessToken;
                 $response = ['token' => $token];
-
-                return response()->json($response, 200);
+                return response()->json($response);
             }
 
             $response = ['message' => 'Password mismatch'];
@@ -200,15 +199,16 @@ class AuthController extends Controller
 
         return response()->json($response, 422);
     }
-    public function authenticate(Request $request): void
+    public function authenticate(Request $request): JsonResponse
     {
         $user = User::where('email', $request->email)->first();
 
         if ($user) {
-            $this->login($request);
+            $response = $this->login($request);
         }else{
-            $this->signup($request);
+            $response = $this->signup($request);
         }
+        return $response;
     }
 
     public function logout(Request $request)
