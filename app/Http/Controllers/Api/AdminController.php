@@ -187,7 +187,6 @@ class AdminController extends Controller
     {
         $user = User::find($request->user()->id);
         $log_viewer = new LaravelLogViewer();
-        dd($log_viewer->all());
         $result = [];
         $count = 0;
         $data = [
