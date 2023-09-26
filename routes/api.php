@@ -23,6 +23,7 @@ Route::group(['prefix' => 'auth'], function () {
     Route::post('authenticate', 'App\Http\Controllers\Api\AuthController@authenticate')->name('authenticate');
     Route::post('signup', 'App\Http\Controllers\Api\AuthController@signup');
     Route::post('googleAuth', 'App\Http\Controllers\Api\AuthController@googleAuth');
+    Route::post('appleAuth', 'App\Http\Controllers\Api\AuthController@appleAuth');
 });
 Route::post('inbrainCallback', 'App\Http\Controllers\Api\AdminController@inBrainsCallback');
 Route::post('pollfishCallback', 'App\Http\Controllers\Api\AdminController@pollfishCallback');

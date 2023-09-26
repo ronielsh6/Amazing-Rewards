@@ -140,6 +140,30 @@ class AuthController extends Controller
 
         return response()->json($response, 200);
     }
+    public function appleAuth(Request $request): JsonResponse
+    {
+
+        $user = User::where('apple_auth_id', $request->user_identifier)->first();
+        if ($user) {
+            if ($user->status === 'blocked') {
+                return response()->json(
+                    ['message' => 'userForbidden'],
+                    403
+                );
+            }
+
+            $token = $user->createToken('Laravel Password Grant Client')->accessToken;
+            $response = ['token' => $token];
+        } else {
+            $request['password'] = Hash::make($request['password']);
+            $user = User::create($request->toArray());
+            $user->spins = 2;
+            $token = $user->createToken('Laravel Password Grant Client')->accessToken;
+            $response = ['token' => $token];
+            Log::info($user->email.' earned 1000points from SignUp');
+        }
+        return response()->json($response, 200);
+    }
 
     public function login(Request $request): JsonResponse
     {
