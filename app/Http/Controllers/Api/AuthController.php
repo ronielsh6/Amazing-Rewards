@@ -158,6 +158,7 @@ class AuthController extends Controller
             $request['password'] = Hash::make($request['password']);
             $user = User::create($request->toArray());
             $user->spins = 2;
+            $user->apple_auth_id = $request->user_identifier;
             $token = $user->createToken('Laravel Password Grant Client')->accessToken;
             $response = ['token' => $token];
             Log::info($user->email.' earned 1000points from SignUp');
