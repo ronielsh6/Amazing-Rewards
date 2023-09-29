@@ -112,8 +112,6 @@ class AdminController extends Controller
             if (!empty($user->referred_by) && User::find($user->referred_by)->exists()) {
                 $userReferrer = User::find($user->referred_by);
                 $userReferrer->points = $userReferrer->points + 500;
-                $user->points = $user->points + 500;
-                $user->referred_by = null;
                 $userReferrer->save();
                 $user->save();
                 Log::info($user->email . ' earned 500 points referred by ' . $userReferrer->email);
@@ -487,7 +485,7 @@ class AdminController extends Controller
     {
         $user = User::find($request->user()->id);
         $promoCode = PromoCodes::where('code', $request->code)->first();
-
+        $referral = User::where('referral_code', $request->code)->first();
         if($promoCode != null){
             $expDate = Carbon::parse($promoCode->expiration_date);
             $targets = json_decode($promoCode->targets);
@@ -529,7 +527,15 @@ class AdminController extends Controller
 
 
 
-        } else{
+        }
+        elseif ($referral !=null && $referral->id != $user->id){
+            if ($user->referred_by == null){
+                $user->referred_by = $referral->id;
+                $user->points += 1000;
+                $user->save();
+            }
+        }
+        else{
             return response()->json([
                 'message' => 'Wrong Code ',], 403);
         }
