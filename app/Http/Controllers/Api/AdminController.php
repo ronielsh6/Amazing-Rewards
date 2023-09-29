@@ -114,7 +114,6 @@ class AdminController extends Controller
                 $userReferrer->points = $userReferrer->points + 500;
                 $userReferrer->save();
                 $user->save();
-                Log::info($user->email . ' earned 500 points referred by ' . $userReferrer->email);
                 Log::info($userReferrer->email . ' earned 500 points for referring ' . $user->email);
             }
             $giftCards = $request->user()->getGiftCards()->get();
@@ -532,7 +531,11 @@ class AdminController extends Controller
             if ($user->referred_by == null){
                 $user->referred_by = $referral->id;
                 $user->points += 1000;
+                Log::info($user->email . ' earned 1000 points referred by ' . $referral->email);
                 $user->save();
+                return response()->json([
+                    'message' => 'Congratulations, you earned 1000 points',
+                ]);
             }
         }
         else{
