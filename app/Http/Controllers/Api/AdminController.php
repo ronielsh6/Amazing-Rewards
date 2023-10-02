@@ -114,7 +114,7 @@ class AdminController extends Controller
                 $userReferrer->points = $userReferrer->points + 1000;
                 $userReferrer->save();
                 $user->save();
-                Log::info($userReferrer->email . ' earned 1000 points for referring ' . $user->email);
+                Log::info($userReferrer->email . ' earned 1000 points referring ' . $user->email);
             }
             $giftCards = $request->user()->getGiftCards()->get();
 
