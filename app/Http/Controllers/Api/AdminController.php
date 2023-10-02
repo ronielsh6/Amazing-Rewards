@@ -111,7 +111,7 @@ class AdminController extends Controller
             $user->save();
             if (!empty($user->referred_by) && User::find($user->referred_by)->exists()) {
                 $userReferrer = User::find($user->referred_by);
-                $userReferrer->points = $userReferrer->points + 500;
+                $userReferrer->points = $userReferrer->points + 1000;
                 $userReferrer->save();
                 $user->save();
                 Log::info($userReferrer->email . ' earned 500 points for referring ' . $user->email);
