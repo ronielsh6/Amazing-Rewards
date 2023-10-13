@@ -143,14 +143,21 @@ class AdminController extends Controller
     public function spinResult(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = User::find($request->user()->id);
+        if ($user->spins_count >= 5 && Carbon::parse($user->last_spin_date)->isToday()){
+            return response()->json([
+                'message' => 'Spin Limit Exceeded',], 403);
+        }
         if ($user->spins > 0){
             if ($request->earnedPoints != null && $request->earnedPoints > 0){
                 $user->points += $request->earnedPoints;
                 Log::info($user->email . ' earned ' . $request->earnedPoints . 'points from Spin');
+                $user->spins -= 1;
+                $user->spins_count += 1;
+                $user->last_spin_date = Carbon::now();
+                $user->touch();
+                $user->save();
             }
-            $user->spins -= 1;
-            $user->touch();
-            $user->save();
+
         }
         return response()->json($user);
     }

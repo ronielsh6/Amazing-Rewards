@@ -34,7 +34,10 @@ class User extends Authenticatable
         'referral_code',
         'email_verified_at',
         'email_verification_code',
-        'spins'
+        'spins',
+        'spins_count',
+        'updated_at',
+        'last_spin_date'
     ];
 
     /**
