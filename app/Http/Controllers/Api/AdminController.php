@@ -151,12 +151,13 @@ class AdminController extends Controller
             if ($request->earnedPoints != null && $request->earnedPoints > 0){
 
                 if ($user->spins_count = 5 && !Carbon::parse($user->last_spin_date)->isToday()){
+                    dd('here');
                     $user->spins_count = 0;
                 }
                 $user->points += $request->earnedPoints;
                 Log::info($user->email . ' earned ' . $request->earnedPoints . 'points from Spin');
                 $user->spins --;
-                $user->spins_count ++;
+                $user->spins_count = $user->spins_count + 1;
                 $user->last_spin_date = Carbon::now();
                 $user->touch();
                 $user->save();
