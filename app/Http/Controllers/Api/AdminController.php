@@ -146,6 +146,9 @@ class AdminController extends Controller
         if ($user->spins_count >= 5 && Carbon::parse($user->last_spin_date)->isToday()){
             return response()->json([
                 'message' => 'Spin Limit Exceeded',], 403);
+        } elseif ($user->spins_count >= 5 && !Carbon::parse($user->last_spin_date)->isToday()){
+            $user->spins_count = 0;
+            $user->save();
         }
         if ($user->spins > 0){
             if ($request->earnedPoints != null && $request->earnedPoints > 0){
