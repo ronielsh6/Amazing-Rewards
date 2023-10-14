@@ -155,8 +155,8 @@ class AdminController extends Controller
                 }
                 $user->points += $request->earnedPoints;
                 Log::info($user->email . ' earned ' . $request->earnedPoints . 'points from Spin');
-                $user->spins -= 1;
-                $user->spins_count += 1;
+                $user->spins --;
+                $user->spins_count ++;
                 $user->last_spin_date = Carbon::now();
                 $user->touch();
                 $user->save();
