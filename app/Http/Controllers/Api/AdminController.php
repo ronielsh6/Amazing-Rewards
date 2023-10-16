@@ -527,7 +527,7 @@ class AdminController extends Controller
                     ]);
                 }
                 $promoCode->save();
-                Log::info($user->email . ' earned '.$promoCode->amount.'points from code '.$promoCode->name);
+                Log::info($user->email . ' earned '.$promoCode->amount.'points from code'.$promoCode->name);
                 return response()->json([
                     'message' => 'Congratulations, you earned '.$promoCode->amount.' points',
                 ], 200);
