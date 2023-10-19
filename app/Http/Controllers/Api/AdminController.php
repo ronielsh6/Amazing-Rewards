@@ -145,7 +145,7 @@ class AdminController extends Controller
         $user = User::find($request->user()->id);
         if ($user->spins_count >= 5 && Carbon::parse($user->last_spin_date)->isToday()){
             return response()->json([
-                'message' => 'Spin Limit Exceeded, 5 spins per day max.',], 403);
+                'message' => 'Daily spin limit reached. You will continue to see 1 spin and the results, however you have reached your max spins of 5 per day and will only be rewarded for the first 5 spins you completed today.',], 403);
         } elseif ($user->spins_count >= 5 && !Carbon::parse($user->last_spin_date)->isToday()){
             $user->spins_count = 0;
             $user->save();
