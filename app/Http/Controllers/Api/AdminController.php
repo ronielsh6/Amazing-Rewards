@@ -97,6 +97,13 @@ class AdminController extends Controller
             $ipNotAllowed = !\in_array($ip_data['geoplugin_countryName'], [$request->country, $user->country], true);
             $countryNotAllowed = !\in_array($request->country, self::ALLOWED_COUNTRIES, true);
 
+            if (version_compare($user->app_version, '1.2.9', '<')) {
+                return response()->json(
+                    ['message' => 'You`re using an old version of the app. Please update it to cash out.'],
+                    409
+                );
+            }
+
             if ($ipNotAllowed or $countryNotAllowed) {
                 $this->BlockUser($user, $ipNotAllowed, $request);
 //
@@ -143,15 +150,15 @@ class AdminController extends Controller
     public function spinResult(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = User::find($request->user()->id);
-        if ($user->spins_count >= 5 && Carbon::parse($user->last_spin_date)->isToday()){
+        if ($user->spins_count >= 5 && Carbon::parse($user->last_spin_date)->isToday()) {
             return response()->json([
                 'message' => 'Daily spin limit reached. You will continue to see 1 spin and the results, however you have reached your max spins of 5 per day and will only be rewarded for the first 5 spins you completed today.',], 403);
-        } elseif ($user->spins_count >= 5 && !Carbon::parse($user->last_spin_date)->isToday()){
+        } elseif ($user->spins_count >= 5 && !Carbon::parse($user->last_spin_date)->isToday()) {
             $user->spins_count = 0;
             $user->save();
         }
-        if ($user->spins > 0){
-            if ($request->earnedPoints != null && $request->earnedPoints > 0){
+        if ($user->spins > 0) {
+            if ($request->earnedPoints != null && $request->earnedPoints > 0) {
                 $user->points += $request->earnedPoints;
                 Log::info($user->email . ' earned ' . $request->earnedPoints . 'points from Spin');
                 $user->spins -= 1;
@@ -168,9 +175,9 @@ class AdminController extends Controller
     public function addSpin(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = User::find($request->user()->id);
-            $user->spins += 1;
-            $user->touch();
-            $user->save();
+        $user->spins += 1;
+        $user->touch();
+        $user->save();
         return response()->json($user);
     }
 
@@ -202,7 +209,7 @@ class AdminController extends Controller
         foreach ($data['logs'] as $datum) {
             if ($datum['level'] === 'info') {
                 if (!empty($datum['text'])) {
-                    list($email, $action, $points, ,$source) = explode(' ', $datum['text']);
+                    list($email, $action, $points, , $source) = explode(' ', $datum['text']);
                     $date = $datum['date'];
                     if ($user->email == $email) {
                         $result[$count] = [
@@ -495,14 +502,14 @@ class AdminController extends Controller
         $user = User::find($request->user()->id);
         $promoCode = PromoCodes::where('code', $request->code)->first();
         $referral = User::where('referral_code', $request->code)->first();
-        if($promoCode != null){
+        if ($promoCode != null) {
             $expDate = Carbon::parse($promoCode->expiration_date);
             $targets = json_decode($promoCode->targets);
-            if($expDate->isPast()){
+            if ($expDate->isPast()) {
                 return response()->json([
                     'message' => 'Promo Code Expired',], 403);
             }
-            if ($targets->data != "all" && !in_array($user->id, $targets->data)){
+            if ($targets->data != "all" && !in_array($user->id, $targets->data)) {
                 return response()->json([
                     'message' => 'You are not authorize to use this promo code',], 403);
             } else {
@@ -510,35 +517,33 @@ class AdminController extends Controller
                 $user->points = $user->points += $promoCode->amount;
                 $user->save();
 
-                if ($targets->data == "all"){
+                if ($targets->data == "all") {
                     $ids = array_column($users, 'id');
                     foreach (array_keys($ids, $user->id) as $key) {
                         unset($ids[$key]);
                     }
-                    $promoCode->targets = json_encode( [
+                    $promoCode->targets = json_encode([
                         'data' => array_values($ids)
                     ]);
                 } else {
                     foreach (array_keys($targets->data, $user->id) as $key) {
                         unset($targets->data[$key]);
                     }
-                    $promoCode->targets = json_encode( [
+                    $promoCode->targets = json_encode([
                         'data' => array_values($targets->data)
                     ]);
                 }
                 $promoCode->save();
-                Log::info($user->email . ' earned '.$promoCode->amount.'points from code'.$promoCode->code);
+                Log::info($user->email . ' earned ' . $promoCode->amount . 'points from code' . $promoCode->code);
                 return response()->json([
-                    'message' => 'Congratulations, you earned '.$promoCode->amount.' points',
+                    'message' => 'Congratulations, you earned ' . $promoCode->amount . ' points',
                 ], 200);
 
             }
 
 
-
-        }
-        elseif ($referral !=null && $referral->id != $user->id){
-            if ($user->referred_by == null){
+        } elseif ($referral != null && $referral->id != $user->id) {
+            if ($user->referred_by == null) {
                 $user->referred_by = $referral->id;
                 $user->points += 1000;
                 Log::info($user->email . ' earned 1000 points referred by ' . $referral->email);
@@ -547,8 +552,7 @@ class AdminController extends Controller
                     'message' => 'Congratulations, you earned $1.00 for being referred',
                 ]);
             }
-        }
-        else{
+        } else {
             return response()->json([
                 'message' => 'Wrong Code ',], 403);
         }
